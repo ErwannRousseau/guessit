@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { categoryLabels, playableCategoryIds, wordsByCategory } from "./words";
+import { categoryLabels, playableCategoryIds, wordsByCategory } from "@/features/game/words";
 
 describe("word catalog", () => {
   test("exposes every playable category with a label and 24 non-empty words", () => {

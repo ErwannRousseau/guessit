@@ -7,10 +7,10 @@ mock.module("react-native-safe-area-context", () => ({
   SafeAreaView: ReactNativeWeb.View,
 }));
 
-let GameScreen: typeof import("./game-screen").GameScreen;
+let GameScreen: typeof import("@/screens/game-screen").GameScreen;
 
 beforeAll(async () => {
-  ({ GameScreen } = await import("./game-screen"));
+  ({ GameScreen } = await import("@/screens/game-screen"));
 });
 
 describe("GameScreen", () => {

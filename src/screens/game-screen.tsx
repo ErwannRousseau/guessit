@@ -4,12 +4,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "@/constants/theme";
 
-import { gameReducer, initialGameState } from "./game-state";
-import { QuestionsScreen, ReadyScreen } from "./questions-screen";
-import { ResultScreen } from "./result-screen";
-import { RoleRevealScreen } from "./role-reveal-screen";
-import { SetupScreen } from "./setup-screen";
-import { VoteScreen } from "./vote-screen";
+import { gameReducer, initialGameState } from "@/features/game/game-state";
+import { QuestionsScreen, ReadyScreen } from "@/features/game/questions-screen";
+import { ResultScreen } from "@/features/game/result-screen";
+import { RoleRevealScreen } from "@/features/game/role-reveal-screen";
+import { SetupScreen } from "@/features/game/setup-screen";
+import { VoteScreen } from "@/features/game/vote-screen";
 
 export function GameScreen() {
   const [game, dispatch] = useReducer(gameReducer, undefined, initialGameState);

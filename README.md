@@ -61,13 +61,16 @@ bun run export:web
 
 `oxfmt.config.ts` fixe la largeur de ligne à 100 caractères. `oxlint.config.ts` active les règles TypeScript, React et React Performance ainsi que les recommandations React Doctor pour React et React Native.
 
+Les conventions de structure sont détaillées dans [docs/architecture.md](./docs/architecture.md).
+
 ## Structure
 
 ```text
 src/
   app/                    # Routes Expo Router
   constants/              # Thème visuel
-  features/game/          # Logique, données et écrans du jeu
+  features/game/          # Logique, données et composants internes du jeu
+  screens/                # Écrans de navigation
   ui/                     # Composants visuels partagés
 ```
 

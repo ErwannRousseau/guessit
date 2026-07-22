@@ -1,7 +1,13 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
 
-import { applyRoundScore, createPlayers, createRound, formatTime, getRole } from "./game-engine";
-import type { Player, Round } from "./game.types";
+import {
+  applyRoundScore,
+  createPlayers,
+  createRound,
+  formatTime,
+  getRole,
+} from "@/features/game/game-engine";
+import type { Player, Round } from "@/features/game/game.types";
 
 const originalRandom = Math.random;
 

@@ -1,4 +1,4 @@
-import { GameScreen } from "@/features/game/game-screen";
+import { GameScreen } from "@/screens/game-screen";
 
 export default function HomeScreen() {
   return <GameScreen />;

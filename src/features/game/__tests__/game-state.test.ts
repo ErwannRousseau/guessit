@@ -1,7 +1,12 @@
 import { describe, expect, test } from "bun:test";
 
-import { gameReducer, initialGameState, MAX_PLAYERS, MIN_PLAYERS } from "./game-state";
-import type { GameState, Round } from "./game.types";
+import {
+  gameReducer,
+  initialGameState,
+  MAX_PLAYERS,
+  MIN_PLAYERS,
+} from "@/features/game/game-state";
+import type { GameState, Round } from "@/features/game/game.types";
 
 function activeGame(roundOverrides: Partial<Round> = {}): GameState {
   return {
