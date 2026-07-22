@@ -22,28 +22,46 @@ Un jeu mobile local de mots cachés et de déduction sociale, développé avec *
 - Classement conservé entre les manches
 - Fonctionnement entièrement hors ligne
 
-## Lancer le projet
+## Développement
 
-Prérequis : Node.js LTS et l’application Expo Go, ou un simulateur iOS/Android.
+Prérequis : [Bun](https://bun.com/) 1.3.9 et l’application Expo Go, ou un simulateur iOS/Android.
 
 ```bash
-npm install
-npm start
+bun install
+bun run start
 ```
 
 Scannez ensuite le QR code avec Expo Go.
 
-### Vérifier TypeScript
+### Qualité du code
 
 ```bash
-npm run typecheck
+bun run format:check
+bun run lint
+bun run typecheck
 ```
 
-### Lancer sur le web
+Pour appliquer automatiquement le formatage Oxfmt :
 
 ```bash
-npm run web
+bun run format
 ```
+
+### Plateformes
+
+```bash
+bun run ios
+bun run android
+bun run web
+```
+
+Pour générer l’export web statique :
+
+```bash
+bun run export:web
+```
+
+Les dépendances sont verrouillées dans `bun.lock`. Utilisez Bun pour toute modification afin de garder ce fichier synchronisé.
 
 ## Structure
 
