@@ -1,23 +1,10 @@
-export type CategoryId =
-  | 'mix'
-  | 'objects'
-  | 'animals'
-  | 'food'
-  | 'places'
-  | 'jobs'
-  | 'leisure';
+export type CategoryId = "mix" | "objects" | "animals" | "food" | "places" | "jobs" | "leisure";
 
-export type Role = 'master' | 'insider' | 'detective';
+export type Role = "master" | "insider" | "detective";
 
-export type GamePhase =
-  | 'setup'
-  | 'roles'
-  | 'ready'
-  | 'questions'
-  | 'vote'
-  | 'result';
+export type GamePhase = "setup" | "roles" | "ready" | "questions" | "vote" | "result";
 
-export type RoundEndReason = 'word-found' | 'time-up';
+export type RoundEndReason = "word-found" | "time-up";
 
 export type Player = {
   id: string;
@@ -27,7 +14,7 @@ export type Player = {
 
 export type Round = {
   word: string;
-  categoryId: Exclude<CategoryId, 'mix'>;
+  categoryId: Exclude<CategoryId, "mix">;
   masterIndex: number;
   insiderIndex: number;
   revealIndex: number;

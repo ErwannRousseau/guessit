@@ -1,5 +1,5 @@
-import type { CategoryId, Player, Role, Round } from './game.types';
-import { playableCategoryIds, wordsByCategory } from './words';
+import type { CategoryId, Player, Role, Round } from "./game.types";
+import { playableCategoryIds, wordsByCategory } from "./words";
 
 function randomIndex(length: number): number {
   return Math.floor(Math.random() * length);
@@ -19,7 +19,7 @@ export function createRound(
   durationSeconds: number,
 ): Round {
   const selectedCategory =
-    categoryId === 'mix'
+    categoryId === "mix"
       ? playableCategoryIds[randomIndex(playableCategoryIds.length)]
       : categoryId;
   const words = wordsByCategory[selectedCategory];
@@ -46,34 +46,28 @@ export function createRound(
 }
 
 export function getRole(round: Round, playerIndex: number): Role {
-  if (playerIndex === round.masterIndex) return 'master';
-  if (playerIndex === round.insiderIndex) return 'insider';
-  return 'detective';
+  if (playerIndex === round.masterIndex) return "master";
+  if (playerIndex === round.insiderIndex) return "insider";
+  return "detective";
 }
 
 export function formatTime(totalSeconds: number): string {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
-export function applyRoundScore(
-  players: Player[],
-  round: Round,
-): Player[] {
+export function applyRoundScore(players: Player[], round: Round): Player[] {
   const detectivesWon =
-    round.endReason === 'word-found' &&
-    round.suspectedIndex === round.insiderIndex;
+    round.endReason === "word-found" && round.suspectedIndex === round.insiderIndex;
 
   return players.map((player, index) => {
     if (detectivesWon) {
-      return index === round.insiderIndex
-        ? player
-        : { ...player, score: player.score + 1 };
+      return index === round.insiderIndex ? player : { ...player, score: player.score + 1 };
     }
 
     if (index === round.insiderIndex) {
-      const points = round.endReason === 'word-found' ? 2 : 1;
+      const points = round.endReason === "word-found" ? 2 : 1;
       return { ...player, score: player.score + points };
     }
 

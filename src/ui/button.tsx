@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -6,11 +6,11 @@ import {
   Text,
   View,
   type PressableProps,
-} from 'react-native';
+} from "react-native";
 
-import { colors, radii, spacing } from '@/constants/theme';
+import { colors, radii, spacing } from "@/constants/theme";
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 
 type ButtonProps = PressableProps & {
   children: ReactNode;
@@ -21,7 +21,7 @@ type ButtonProps = PressableProps & {
 
 export function Button({
   children,
-  variant = 'primary',
+  variant = "primary",
   loading = false,
   fullWidth = true,
   disabled,
@@ -38,13 +38,13 @@ export function Button({
         fullWidth && styles.fullWidth,
         pressed && !disabled && styles.pressed,
         (disabled || loading) && styles.disabled,
-        typeof style === 'function' ? style({ pressed }) : style,
+        typeof style === "function" ? style({ pressed }) : style,
       ]}
       {...props}
     >
       <View style={styles.content}>
         {loading ? (
-          <ActivityIndicator color={variant === 'primary' ? colors.white : colors.ink} />
+          <ActivityIndicator color={variant === "primary" ? colors.white : colors.ink} />
         ) : null}
         <Text style={[styles.label, labelStyles[variant]]}>{children}</Text>
       </View>
@@ -55,27 +55,27 @@ export function Button({
 const styles = StyleSheet.create({
   base: {
     minHeight: 54,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderRadius: radii.medium,
-    borderCurve: 'continuous',
+    borderCurve: "continuous",
   },
   fullWidth: {
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
   },
   content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: spacing.sm,
   },
   label: {
     fontSize: 17,
     lineHeight: 22,
-    fontWeight: '700',
-    textAlign: 'center',
+    fontWeight: "700",
+    textAlign: "center",
   },
   pressed: {
     opacity: 0.82,
@@ -96,7 +96,7 @@ const variantStyles = StyleSheet.create({
     borderColor: colors.line,
   },
   ghost: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   danger: {
     backgroundColor: colors.dangerSoft,
