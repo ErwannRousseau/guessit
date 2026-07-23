@@ -17,6 +17,10 @@ mock.module("expo-haptics", () => ({
   NotificationFeedbackType: { Warning: "warning" },
   notificationAsync: async () => {},
 }));
+mock.module("expo-store-review", () => ({
+  isAvailableAsync: async () => false,
+  requestReview: async () => {},
+}));
 
 let GameScreen: typeof import("@/screens/game-screen").GameScreen;
 

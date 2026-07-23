@@ -1,6 +1,7 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import * as Haptics from "expo-haptics";
+import * as StoreReview from "expo-store-review";
 import { Alert, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -15,6 +16,7 @@ import { VotePhase } from "@/features/game/vote-phase";
 
 export function GameScreen() {
   const [game, dispatch] = useReducer(gameReducer, undefined, initialGameState);
+  const hasRequestedReview = useRef(false);
   const timerFinishedPlayer = useAudioPlayer(require("../../assets/sounds/timer-finished.wav"));
 
   useEffect(() => {
@@ -41,6 +43,17 @@ export function GameScreen() {
     }, 1000);
     return () => clearInterval(interval);
   }, [game.phase, game.round?.timerRunning, game.round?.remainingSeconds, timerFinishedPlayer]);
+
+  useEffect(() => {
+    if (game.phase !== "result" || game.roundNumber !== 3 || hasRequestedReview.current) {
+      return;
+    }
+
+    hasRequestedReview.current = true;
+    void StoreReview.isAvailableAsync()
+      .then((isAvailable) => (isAvailable ? StoreReview.requestReview() : undefined))
+      .catch(() => undefined);
+  }, [game.phase, game.roundNumber]);
 
   const resetGame = () => {
     Alert.alert("Revenir à l’accueil ?", "Les scores de cette partie seront effacés.", [
