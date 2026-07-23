@@ -1,4 +1,8 @@
 {
   "buildCommand": "bun run export:web",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/support", "destination": "/support.html" }
+  ]
 }

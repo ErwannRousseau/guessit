@@ -1,4 +1,4 @@
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { colors, spacing } from "@/constants/theme";
 import { Button } from "@/ui/button";
@@ -85,6 +85,27 @@ export function SetupPhase({
         Jeu original indépendant, inspiré des mécaniques classiques de mots cachés et de déduction
         sociale.
       </Text>
+      <View style={styles.legalLinks}>
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => void Linking.openURL("https://guessit.erwannrousseau.dev/privacy")}
+        >
+          <Text selectable style={styles.legalLink}>
+            Confidentialité
+          </Text>
+        </Pressable>
+        <Text selectable style={styles.legalSeparator}>
+          ·
+        </Text>
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => void Linking.openURL("https://guessit.erwannrousseau.dev/support")}
+        >
+          <Text selectable style={styles.legalLink}>
+            Support
+          </Text>
+        </Pressable>
+      </View>
     </ScrollView>
   );
 }
@@ -152,5 +173,21 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     textAlign: "center",
     paddingHorizontal: spacing.md,
+  },
+  legalLinks: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  legalLink: {
+    color: colors.primary,
+    fontSize: 13,
+    fontWeight: "800",
+    textDecorationLine: "underline",
+  },
+  legalSeparator: {
+    color: colors.muted,
+    fontSize: 13,
   },
 });
