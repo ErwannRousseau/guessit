@@ -9,14 +9,14 @@ this file keeps only durable domain boundaries and invariants.
 
 ## WHERE TO LOOK
 
-| Change | Location | Constraint |
-|---|---|---|
-| State transitions | `game-state.ts` | Preserve exhaustive action handling |
-| Role assignment and scoring | `game-engine.ts` | Keep domain arithmetic out of UI |
-| Domain shapes | `game.types.ts` | Trace all references before changing |
-| Vocabulary | `words.ts` | Keep labels, playable IDs, and catalogs aligned |
-| Internal game UI | `*-phase.tsx`, supporting components | Keep secret information private |
-| Behavior tests | `__tests__/` | Follow current local fixtures and mocks |
+| Change                      | Location                             | Constraint                                      |
+| --------------------------- | ------------------------------------ | ----------------------------------------------- |
+| State transitions           | `game-state.ts`                      | Preserve exhaustive action handling             |
+| Role assignment and scoring | `game-engine.ts`                     | Keep domain arithmetic out of UI                |
+| Domain shapes               | `game.types.ts`                      | Trace all references before changing            |
+| Vocabulary                  | `words.ts`                           | Keep labels, playable IDs, and catalogs aligned |
+| Internal game UI            | `*-phase.tsx`, supporting components | Keep secret information private                 |
+| Behavior tests              | `__tests__/`                         | Follow current local fixtures and mocks         |
 
 ## CONVENTIONS
 

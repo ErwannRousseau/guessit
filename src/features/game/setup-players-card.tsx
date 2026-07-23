@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceStrong,
     color: colors.ink,
     fontSize: 15,
-    fontWeight: "700"
+    fontWeight: "700",
   },
   controlPressed: { opacity: 0.72, transform: [{ scale: 0.97 }] },
   controlDisabled: { opacity: 0.35 },

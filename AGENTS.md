@@ -25,14 +25,14 @@ docs/
 
 ## WHERE TO LOOK
 
-| Task | Location | Notes |
-|---|---|---|
-| App bootstrap/navigation | `src/app/` | Verify current routes before editing |
-| Route-level orchestration | `src/screens/` | Components rendered directly by routes |
-| Game domain | `src/features/game/` | Logic, data, internal components, colocated tests |
-| Shared visuals | `src/ui/` | Cross-feature visual components |
-| Cross-cutting constants | `src/constants/` | Theme and other shared constants |
-| Feature-specific rules | `src/features/game/AGENTS.md` | Read before changing game behavior |
+| Task                      | Location                      | Notes                                             |
+| ------------------------- | ----------------------------- | ------------------------------------------------- |
+| App bootstrap/navigation  | `src/app/`                    | Verify current routes before editing              |
+| Route-level orchestration | `src/screens/`                | Components rendered directly by routes            |
+| Game domain               | `src/features/game/`          | Logic, data, internal components, colocated tests |
+| Shared visuals            | `src/ui/`                     | Cross-feature visual components                   |
+| Cross-cutting constants   | `src/constants/`              | Theme and other shared constants                  |
+| Feature-specific rules    | `src/features/game/AGENTS.md` | Read before changing game behavior                |
 
 ## CONVENTIONS
 
