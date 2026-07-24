@@ -11,7 +11,9 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "erwann.rousseau@icloud.com"
+        "appleId": "erwann.rousseau@icloud.com",
+        "ascAppId": "6794387024",
+        "appleTeamId": "98FD594FLL"
       }
     }
   }
