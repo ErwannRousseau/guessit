@@ -1,0 +1,212 @@
+name: Prepare release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Public semantic version, without the v prefix
+        required: true
+        type: string
+      release_notes:
+        description: French release notes used by GitHub, Apple, and Google Play
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: prepare-release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Create release pull request
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+      RELEASE_NOTES: ${{ inputs.release_notes }}
+      RELEASE_BRANCH: release/${{ inputs.version }}
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate release input
+        run: |
+          if [[ "$GITHUB_REF_NAME" != "main" ]]; then
+            echo "::error::Run this workflow from the main branch."
+            exit 1
+          fi
+
+          if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Version must use X.Y.Z semantic versioning."
+            exit 1
+          fi
+
+          if [[ -z "${RELEASE_NOTES//[[:space:]]/}" ]]; then
+            echo "::error::Release notes cannot be empty."
+            exit 1
+          fi
+
+          if git show-ref --verify --quiet "refs/tags/v$RELEASE_VERSION"; then
+            echo "::error::Tag v$RELEASE_VERSION already exists."
+            exit 1
+          fi
+
+          if git ls-remote --exit-code --heads origin "$RELEASE_BRANCH" >/dev/null 2>&1; then
+            echo "::error::Branch $RELEASE_BRANCH already exists."
+            exit 1
+          fi
+
+          if [[ -e "store-metadata/apple/version/$RELEASE_VERSION" ]]; then
+            echo "::error::Apple metadata already exists for $RELEASE_VERSION."
+            exit 1
+          fi
+
+          bun --eval '
+            const current = JSON.parse(await Bun.file("package.json").text()).version;
+            const next = process.env.RELEASE_VERSION;
+            const toParts = (value) => value.split(".").map(Number);
+            const [currentMajor, currentMinor, currentPatch] = toParts(current);
+            const [nextMajor, nextMinor, nextPatch] = toParts(next);
+            const isNewer =
+              nextMajor > currentMajor ||
+              (nextMajor === currentMajor && nextMinor > currentMinor) ||
+              (nextMajor === currentMajor &&
+                nextMinor === currentMinor &&
+                nextPatch > currentPatch);
+
+            if (!isNewer) {
+              console.error(`::error::Version ${next} must be newer than ${current}.`);
+              process.exit(1);
+            }
+          '
+
+      - name: Update versioned release files
+        run: |
+          SOURCE_METADATA_DIR="$(
+            printf '%s\n' store-metadata/apple/version/* |
+              sort -V |
+              tail -n 1
+          )"
+          TARGET_METADATA_DIR="store-metadata/apple/version/$RELEASE_VERSION"
+
+          if [[ ! -d "$SOURCE_METADATA_DIR" ]]; then
+            echo "::error::No source Apple metadata directory was found."
+            exit 1
+          fi
+
+          cp -R "$SOURCE_METADATA_DIR" "$TARGET_METADATA_DIR"
+
+          bun --eval '
+            import {
+              mkdirSync,
+              readFileSync,
+              readdirSync,
+              writeFileSync,
+            } from "node:fs";
+            import { join } from "node:path";
+
+            const version = process.env.RELEASE_VERSION;
+            const releaseNotes = process.env.RELEASE_NOTES.trim();
+
+            const packagePath = "package.json";
+            const packageJson = JSON.parse(readFileSync(packagePath, "utf8"));
+            packageJson.version = version;
+            writeFileSync(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+
+            const appConfigPath = "app.config.ts";
+            const appConfig = readFileSync(appConfigPath, "utf8");
+            const versionPattern = /^  version: "[^"]+",$/gm;
+            const matches = appConfig.match(versionPattern) ?? [];
+            if (matches.length !== 1) {
+              throw new Error("Expected exactly one Expo version field.");
+            }
+            writeFileSync(
+              appConfigPath,
+              appConfig.replace(versionPattern, `  version: "${version}",`),
+            );
+
+            const metadataDirectory = join(
+              "store-metadata",
+              "apple",
+              "version",
+              version,
+            );
+            for (const filename of readdirSync(metadataDirectory)) {
+              if (!filename.endsWith(".json")) continue;
+              const filePath = join(metadataDirectory, filename);
+              const metadata = JSON.parse(readFileSync(filePath, "utf8"));
+              metadata.whatsNew = releaseNotes;
+              writeFileSync(filePath, `${JSON.stringify(metadata, null, 2)}\n`);
+            }
+
+            const releaseDirectory = join("store-metadata", "releases");
+            mkdirSync(releaseDirectory, { recursive: true });
+            writeFileSync(
+              join(releaseDirectory, `${version}.md`),
+              `# GuessIt v${version}\n\n${releaseNotes}\n`,
+            );
+          '
+
+          bunx oxfmt --write \
+            app.config.ts \
+            package.json \
+            "$TARGET_METADATA_DIR"/*.json \
+            "store-metadata/releases/$RELEASE_VERSION.md"
+
+      - name: Validate prepared release
+        run: |
+          bun run format:check
+          bun run lint
+          bun run typecheck
+          bun run test
+
+      - name: Commit release branch
+        run: |
+          git switch -c "$RELEASE_BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app.config.ts package.json store-metadata
+          git commit -m "chore(release): prepare v$RELEASE_VERSION"
+          git push --set-upstream origin "$RELEASE_BRANCH"
+
+      - name: Open release pull request
+        id: pull-request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_BODY="$RUNNER_TEMP/release-pr.md"
+          {
+            printf '## Summary\n\n'
+            printf 'Prepare GuessIt v%s for the stores.\n\n' "$RELEASE_VERSION"
+            printf '## Details\n\n'
+            printf -- '- Align the public Expo and package versions.\n'
+            printf -- '- Version the shared release notes and Apple metadata.\n'
+            printf -- '- Create v%s after this pull request is merged.\n\n' "$RELEASE_VERSION"
+            printf '## Release notes\n\n%s\n' "$RELEASE_NOTES"
+          } >"$PR_BODY"
+
+          PR_URL="$(
+            gh pr create \
+              --base main \
+              --head "$RELEASE_BRANCH" \
+              --title "chore(release): prepare v$RELEASE_VERSION" \
+              --body-file "$PR_BODY"
+          )"
+          echo "url=$PR_URL" >>"$GITHUB_OUTPUT"
+          printf 'Release pull request: %s\n' "$PR_URL" >>"$GITHUB_STEP_SUMMARY"
