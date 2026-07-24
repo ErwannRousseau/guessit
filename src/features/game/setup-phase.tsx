@@ -80,7 +80,9 @@ export function SetupPhase({
           text="Le Complice guide discrètement le groupe sans se faire repérer."
         />
       </Card>
-      <Button onPress={onStart}>Distribuer les rôles</Button>
+      <Button haptic="light" onPress={onStart}>
+        Distribuer les rôles
+      </Button>
       <Text selectable style={styles.legalNote}>
         Jeu original indépendant, inspiré des mécaniques classiques de mots cachés et de déduction
         sociale.

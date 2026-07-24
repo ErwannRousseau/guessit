@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 import { colors, radii, spacing } from "@/constants/theme";
 import { Card } from "@/ui/card";
+import { Pressable } from "@/ui/pressable";
 
 import { MAX_PLAYERS, MIN_PLAYERS } from "./game-state";
 import type { GameState } from "./game.types";
@@ -81,6 +82,7 @@ function PlayerCountButton({
       accessibilityRole="button"
       accessibilityLabel={label}
       disabled={disabled}
+      haptic="selection"
       onPress={onPress}
       style={({ pressed }) => [
         styles.stepperButton,

@@ -1,8 +1,15 @@
-import { beforeAll, describe, expect, mock, test } from "bun:test";
+import { beforeAll, beforeEach, describe, expect, mock, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as ReactNativeWeb from "react-native-web";
 
-mock.module("react-native", () => ReactNativeWeb);
+const impactAsync = mock(async () => {});
+const notificationAsync = mock(async () => {});
+const selectionAsync = mock(async () => {});
+
+mock.module("react-native", () => ({
+  ...ReactNativeWeb,
+  Platform: { OS: "ios" },
+}));
 mock.module("react-native-safe-area-context", () => ({
   SafeAreaView: ReactNativeWeb.View,
 }));
@@ -14,8 +21,11 @@ mock.module("expo-audio", () => ({
   useAudioPlayer: () => ({ play: () => {}, seekTo: async () => {} }),
 }));
 mock.module("expo-haptics", () => ({
-  NotificationFeedbackType: { Warning: "warning" },
-  notificationAsync: async () => {},
+  ImpactFeedbackStyle: { Light: "light", Medium: "medium" },
+  NotificationFeedbackType: { Success: "success", Warning: "warning" },
+  impactAsync,
+  notificationAsync,
+  selectionAsync,
 }));
 mock.module("expo-store-review", () => ({
   isAvailableAsync: async () => false,
@@ -23,9 +33,19 @@ mock.module("expo-store-review", () => ({
 }));
 
 let GameScreen: typeof import("@/screens/game-screen").GameScreen;
+let Platform: typeof import("react-native").Platform;
+let Pressable: typeof import("@/ui/pressable").Pressable;
 
 beforeAll(async () => {
   ({ GameScreen } = await import("@/screens/game-screen"));
+  ({ Platform } = await import("react-native"));
+  ({ Pressable } = await import("@/ui/pressable"));
+});
+
+beforeEach(() => {
+  impactAsync.mockClear();
+  notificationAsync.mockClear();
+  selectionAsync.mockClear();
 });
 
 describe("GameScreen", () => {
@@ -36,5 +56,43 @@ describe("GameScreen", () => {
     expect(markup.match(/role="radio"/g)).toHaveLength(10);
     expect(markup.match(/aria-disabled="true"/g)).toHaveLength(1);
     expect(markup.match(/role="button"/g)).toHaveLength(3);
+  });
+});
+
+describe("Pressable", () => {
+  const press = (haptic?: import("@/ui/pressable").HapticFeedback) => {
+    const element = Pressable({ children: "Action", haptic });
+    element.props.onPress({});
+  };
+
+  test("stays silent without a haptic prop", () => {
+    press();
+
+    expect(impactAsync).not.toHaveBeenCalled();
+    expect(notificationAsync).not.toHaveBeenCalled();
+    expect(selectionAsync).not.toHaveBeenCalled();
+  });
+
+  test("stays silent on web", () => {
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "web" });
+
+    press("warning");
+
+    expect(notificationAsync).not.toHaveBeenCalled();
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" });
+  });
+
+  test("maps each haptic prop to its native effect", () => {
+    press("selection");
+    press("light");
+    press("medium");
+    press("success");
+    press("warning");
+
+    expect(selectionAsync).toHaveBeenCalledTimes(1);
+    expect(impactAsync).toHaveBeenNthCalledWith(1, "light");
+    expect(impactAsync).toHaveBeenNthCalledWith(2, "medium");
+    expect(notificationAsync).toHaveBeenNthCalledWith(1, "success");
+    expect(notificationAsync).toHaveBeenNthCalledWith(2, "warning");
   });
 });

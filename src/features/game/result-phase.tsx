@@ -70,7 +70,9 @@ export function ResultPhase({
           </View>
         ))}
       </Card>
-      <Button onPress={onNextRound}>Nouvelle manche</Button>
+      <Button haptic="light" onPress={onNextRound}>
+        Nouvelle manche
+      </Button>
       <Button variant="ghost" onPress={onReset}>
         Terminer la partie
       </Button>

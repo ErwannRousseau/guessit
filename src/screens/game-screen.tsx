@@ -1,11 +1,11 @@
 import { useEffect, useReducer, useRef } from "react";
 import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
-import * as Haptics from "expo-haptics";
 import * as StoreReview from "expo-store-review";
 import { Alert, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "@/constants/theme";
+import { triggerHaptic } from "@/lib/haptics";
 
 import { gameReducer, initialGameState } from "@/features/game/game-state";
 import { ResultPhase } from "@/features/game/result-phase";
@@ -35,9 +35,7 @@ export function GameScreen() {
     const interval = setInterval(() => {
       if (game.round?.remainingSeconds === 1) {
         void timerFinishedPlayer.seekTo(0).then(() => timerFinishedPlayer.play());
-        if (Platform.OS !== "web") {
-          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-        }
+        triggerHaptic("warning");
       }
       dispatch({ type: "timerTick" });
     }, 1000);
@@ -58,7 +56,14 @@ export function GameScreen() {
   const resetGame = () => {
     Alert.alert("Revenir à l’accueil ?", "Les scores de cette partie seront effacés.", [
       { text: "Annuler", style: "cancel" },
-      { text: "Effacer", style: "destructive", onPress: () => dispatch({ type: "reset" }) },
+      {
+        text: "Effacer",
+        style: "destructive",
+        onPress: () => {
+          dispatch({ type: "reset" });
+          triggerHaptic("warning");
+        },
+      },
     ]);
   };
 

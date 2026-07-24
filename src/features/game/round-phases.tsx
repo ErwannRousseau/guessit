@@ -46,7 +46,9 @@ export function ReadyPhase({
         <RuleLine text="Aucun geste, mime ou indice direct" />
         <RuleLine text="Quand le mot est trouvé, arrêtez le chrono" />
       </Card>
-      <Button onPress={onStart}>Lancer la manche</Button>
+      <Button haptic="light" onPress={onStart}>
+        Lancer la manche
+      </Button>
     </ScrollView>
   );
 }
@@ -93,11 +95,13 @@ export function QuestionsPhase({
           Le Complice connaît la réponse. Observez qui pose les questions les plus utiles.
         </Text>
       </Card>
-      <Button variant="secondary" onPress={onToggleTimer}>
+      <Button haptic="light" variant="secondary" onPress={onToggleTimer}>
         {round.timerRunning ? "Mettre en pause" : "Reprendre le chrono"}
       </Button>
-      <Button onPress={onWordFound}>Le mot a été trouvé</Button>
-      <Button variant="ghost" onPress={onGiveUp}>
+      <Button haptic="success" onPress={onWordFound}>
+        Le mot a été trouvé
+      </Button>
+      <Button haptic="warning" variant="ghost" onPress={onGiveUp}>
         Temps écoulé / abandonner
       </Button>
     </ScrollView>

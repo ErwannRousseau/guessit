@@ -39,13 +39,15 @@ export function RoleRevealPhase({
           <Text selectable style={styles.centerSubtitle}>
             Vérifie que personne ne regarde l’écran, puis découvre ton rôle.
           </Text>
-          <Button onPress={onShowRole}>Voir mon rôle</Button>
+          <Button haptic="light" onPress={onShowRole}>
+            Voir mon rôle
+          </Button>
         </>
       ) : (
         <RoleCard role={role} word={round.word} playerName={player.name} />
       )}
       {round.roleVisible ? (
-        <Button onPress={onHideAndContinue}>
+        <Button haptic="light" onPress={onHideAndContinue}>
           {isLastPlayer ? "J’ai mémorisé — continuer" : "J’ai mémorisé — joueur suivant"}
         </Button>
       ) : null}

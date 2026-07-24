@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { colors, radii, spacing } from "@/constants/theme";
 import { Card } from "@/ui/card";
+import { Pressable } from "@/ui/pressable";
 
 import type { CategoryId } from "./game.types";
 import { categoryLabels } from "./words";
@@ -103,6 +104,7 @@ function ChoiceChip({
     <Pressable
       accessibilityRole="radio"
       accessibilityState={{ selected }}
+      haptic={selected ? undefined : "selection"}
       onPress={onPress}
       style={({ pressed }) => [
         styles.chip,

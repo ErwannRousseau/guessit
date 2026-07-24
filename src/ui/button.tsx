@@ -1,14 +1,8 @@
 import type { ReactNode } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  type PressableProps,
-} from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 import { colors, radii, spacing } from "@/constants/theme";
+import { Pressable, type PressableProps } from "@/ui/pressable";
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 

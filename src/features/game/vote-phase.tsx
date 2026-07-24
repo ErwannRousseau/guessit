@@ -1,7 +1,8 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { colors, radii, spacing } from "@/constants/theme";
 import { Button } from "@/ui/button";
+import { Pressable } from "@/ui/pressable";
 
 import type { Player, Round } from "./game.types";
 
@@ -40,6 +41,7 @@ export function VotePhase({
               accessibilityRole="radio"
               accessibilityState={{ selected, disabled: isMaster }}
               disabled={isMaster}
+              haptic={selected ? undefined : "selection"}
               onPress={() => onSelect(index)}
               style={({ pressed }) => [
                 styles.suspectCard,
@@ -63,7 +65,7 @@ export function VotePhase({
           );
         })}
       </View>
-      <Button disabled={round.suspectedIndex === null} onPress={onReveal}>
+      <Button disabled={round.suspectedIndex === null} haptic="medium" onPress={onReveal}>
         Révéler le Complice
       </Button>
     </ScrollView>
