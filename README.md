@@ -1,36 +1,41 @@
 # GuessIt
 
-Un jeu mobile local de mots cachés et de déduction sociale, développé avec **Expo**, **React Native**, **Expo Router** et **TypeScript**.
+A local hidden-word and social-deduction mobile game built with **Expo**, **React Native**,
+**Expo Router**, and **TypeScript**.
 
-## Principe
+## How it works
 
-- Un **Maître du jeu** connaît le mot et répond uniquement par oui, non ou « je ne sais pas ».
-- Un **Complice** connaît également le mot et aide discrètement le groupe.
-- Les **Enquêteurs** doivent trouver le mot puis identifier le Complice.
-- Tout se joue sur un seul téléphone, que les joueurs se passent pour découvrir leur rôle.
+- A **Game Master** knows the word and can answer only yes, no, or "I don't know."
+- An **Insider** also knows the word and discreetly helps the group.
+- The **Detectives** must find the word, then identify the Insider.
+- The entire game is played on a single phone, which players pass around to discover their roles.
 
-## Déroulement d’une partie
+## Game flow
 
-1. Configurez 4 à 10 joueurs, une catégorie de mots et un chronomètre de 3, 5 ou 7 minutes.
-2. Passez le téléphone à chaque joueur pour révéler son rôle en privé. Le Maître du jeu et le Complice connaissent le mot ; les Enquêteurs l’ignorent.
-3. Le Maître répond aux questions pendant le chronomètre, qui peut être mis en pause.
-4. Si le mot est trouvé, le groupe vote pour identifier le Complice. Si le temps expire ou si le groupe abandonne, le Complice gagne la manche.
-5. Les points et le classement sont calculés automatiquement et conservés pour la manche suivante.
+1. Set up 4 to 10 players, a word category, and a 3-, 5-, or 7-minute timer.
+2. Pass the phone to each player to reveal their role privately. The Game Master and the Insider
+   know the word; the Detectives do not.
+3. The Game Master answers questions while the timer runs. The timer can be paused.
+4. If the word is found, the group votes to identify the Insider. If time runs out or the group
+   gives up, the Insider wins the round.
+5. Points and rankings are calculated automatically and carried over to the next round.
 
-Le jeu contient 144 mots dans 6 catégories et fonctionne hors ligne.
+The game contains 144 words across 6 categories and works offline.
 
-## Développement
+## Development
 
-Prérequis : [Bun](https://bun.com/) 1.3.14 et l’application Expo Go, ou un simulateur iOS/Android.
+Requirements: [Bun](https://bun.com/) 1.3.14 and the Expo Go app, or an iOS/Android
+simulator.
 
 ```bash
 bun install
 bun run start
 ```
 
-Scannez ensuite le QR code avec Expo Go. Les dépendances sont verrouillées dans `bun.lock`; utilisez Bun pour les modifier.
+Then scan the QR code with Expo Go. Dependencies are locked in `bun.lock`; use Bun to modify
+them.
 
-### Qualité du code
+### Code quality
 
 ```bash
 bun run format:check
@@ -39,13 +44,13 @@ bun run test
 bun run typecheck
 ```
 
-Pour appliquer automatiquement le formatage Oxfmt :
+To apply Oxfmt formatting automatically:
 
 ```bash
 bun run format
 ```
 
-### Plateformes
+### Platforms
 
 ```bash
 bun run ios
@@ -53,37 +58,41 @@ bun run android
 bun run web
 ```
 
-Pour générer l’export web statique :
+To generate the static web export:
 
 ```bash
 bun run export:web
 ```
 
-`oxfmt.config.ts` fixe la largeur de ligne à 100 caractères. `oxlint.config.ts` active les règles TypeScript, React et React Performance ainsi que les recommandations React Doctor pour React et React Native.
+`oxfmt.config.ts` sets the line width to 100 characters. `oxlint.config.ts` enables the
+TypeScript, React, and React Performance rules, along with the React Doctor recommendations for
+React and React Native.
 
-Les conventions de structure sont détaillées dans [docs/architecture.md](./docs/architecture.md).
+The structural conventions are detailed in
+[docs/architecture.md](./docs/architecture.md).
 
 ## Structure
 
 ```text
 src/
-  app/                    # Routes Expo Router
-  constants/              # Thème visuel
-  features/game/          # Logique, données et composants internes du jeu
-  screens/                # Écrans de navigation
-  ui/                     # Composants visuels partagés
+  app/                    # Expo Router routes
+  constants/              # Visual theme
+  features/game/          # Game logic, data, and internal components
+  screens/                # Navigation screens
+  ui/                     # Shared visual components
 ```
 
-## Règles de score
+## Scoring rules
 
-- Mot trouvé + Complice identifié : **+1 point** pour tous les joueurs sauf le Complice.
-- Mot trouvé + mauvaise accusation : **+2 points** pour le Complice.
-- Mot non trouvé avant la fin : **+1 point** pour le Complice.
+- Word found + Insider identified: **+1 point** for every player except the Insider.
+- Word found + wrong accusation: **+2 points** for the Insider.
+- Word not found before time runs out: **+1 point** for the Insider.
 
-## Indépendance
+## Independence
 
-GuessIt est un projet original indépendant fondé sur des mécaniques génériques de mots cachés et de déduction sociale. Il n’est affilié à aucun jeu commercial existant.
+GuessIt is an original, independent project based on generic hidden-word and social-deduction
+mechanics. It is not affiliated with any existing commercial game.
 
-## Licence
+## License
 
-MIT — voir [LICENSE](./LICENSE).
+MIT — see [LICENSE](./LICENSE).

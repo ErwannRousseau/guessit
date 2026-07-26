@@ -1,28 +1,30 @@
 # Architecture
 
-Le projet sépare les routes, les écrans de navigation et les fonctionnalités métier.
+The project separates routes, navigation screens, and domain features.
 
-## Frontières
+## Boundaries
 
-- `src/app/` contient uniquement les routes Expo Router.
-- `src/screens/` contient les écrans directement rendus par une route.
-- `src/features/<feature>/` regroupe la logique métier, les données et les composants internes d’une fonctionnalité.
-- `src/ui/` contient les composants visuels partagés entre plusieurs fonctionnalités.
-- `src/constants/` contient les constantes transversales, comme le thème.
+- `src/app/` contains only Expo Router routes.
+- `src/screens/` contains screens rendered directly by a route.
+- `src/features/<feature>/` contains a feature's domain logic, data, and internal components.
+- `src/ui/` contains visual components shared across multiple features.
+- `src/constants/` contains cross-cutting constants, such as the theme.
 
-Une phase interne du jeu reste dans `src/features/game/` et utilise le suffixe `Phase`. Elle ne devient un écran avec le suffixe `Screen` dans `src/screens/` que si Expo Router la rend directement.
+An internal game phase stays in `src/features/game/` and uses the `Phase` suffix. It becomes a
+screen with the `Screen` suffix in `src/screens/` only when rendered directly by Expo Router.
 
 ## Imports
 
-Les modules applicatifs utilisent l’alias `@/` défini dans `tsconfig.json`. Aucun fichier `index.ts` de réexport n’est nécessaire.
+Application modules use the `@/` alias defined in `tsconfig.json`. No re-exporting `index.ts`
+file is needed.
 
 ## Tests
 
-Les tests sont colocalisés dans un dossier `__tests__` sous le domaine testé :
+Tests are colocated in a `__tests__` directory under the domain being tested:
 
 ```text
 src/screens/__tests__/game-screen.test.tsx
 src/features/game/__tests__/game-state.test.ts
 ```
 
-Les tests importent les modules applicatifs avec l’alias `@/`.
+Tests import application modules using the `@/` alias.
