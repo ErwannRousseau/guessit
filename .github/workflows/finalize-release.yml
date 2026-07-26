@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   finalize:
-    name: Create tag and draft GitHub Release
+    name: Create release tag
     if: >-
       github.event.pull_request.merged == true &&
       startsWith(github.event.pull_request.head.ref, 'release/')
@@ -25,7 +25,6 @@ jobs:
     env:
       RELEASE_BRANCH: ${{ github.event.pull_request.head.ref }}
       RELEASE_COMMIT: ${{ github.event.pull_request.merge_commit_sha }}
-      GH_TOKEN: ${{ github.token }}
 
     steps:
       - name: Checkout merged release
@@ -58,7 +57,6 @@ jobs:
             exit 1
           fi
 
-          echo "version=$VERSION" >>"$GITHUB_OUTPUT"
           echo "tag=$TAG" >>"$GITHUB_OUTPUT"
 
       - name: Create annotated tag
@@ -80,25 +78,5 @@ jobs:
             git push origin "$TAG"
           fi
 
-      - name: Create draft GitHub Release
-        env:
-          TAG: ${{ steps.release.outputs.tag }}
-          VERSION: ${{ steps.release.outputs.version }}
-        run: |
-          NOTES_FILE="store-metadata/releases/$VERSION.md"
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release edit "$TAG" \
-              --draft \
-              --title "GuessIt $TAG" \
-              --notes-file "$NOTES_FILE" \
-              --verify-tag
-          else
-            gh release create "$TAG" \
-              --draft \
-              --title "GuessIt $TAG" \
-              --notes-file "$NOTES_FILE" \
-              --verify-tag
-          fi
-
-          printf 'Draft GitHub Release created for %s.\n' "$TAG" \
+          printf 'Release tag `%s` is ready for EAS.\n' "$TAG" \
             >>"$GITHUB_STEP_SUMMARY"

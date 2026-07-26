@@ -12,7 +12,6 @@ repository setup.
 3. Connect the repository to the GuessIt project from the Expo dashboard so EAS Workflows
    receive GitHub tag events.
 4. Add these GitHub Actions secrets:
-   - `EXPO_TOKEN`: an Expo access token allowed to run the GuessIt EAS project.
    - `ASC_KEY_ID`: the App Store Connect API key ID.
    - `ASC_ISSUER_ID`: the App Store Connect API issuer ID.
    - `ASC_PRIVATE_KEY_B64`: the base64-encoded App Store Connect `.p8` private key.
@@ -28,19 +27,20 @@ in [ADR 0002](adr/0002-automate-releases-from-github.md).
 1. Open **Actions → Prepare release → Run workflow** from `main`.
 2. Enter the public `X.Y.Z` version and the French release notes.
 3. Review the generated `release/X.Y.Z` pull request, approve its CI run, then squash-merge it.
-4. The merge creates the annotated `vX.Y.Z` tag and a draft GitHub Release.
+4. The merge creates the annotated `vX.Y.Z` tag.
 5. The tag automatically starts the EAS iOS production build and uploads it to TestFlight.
 6. After testing the build, open **Actions → Submit App Review → Run workflow**, enter `X.Y.Z`,
    and check the submission confirmation.
 
 The preparation workflow keeps `package.json`, `app.config.ts`, Apple metadata, shared release
-notes, the Git tag, and the GitHub Release on the same public version. EAS independently
-increments the technical iOS build number.
+notes, and the Git tag on the same public version. EAS independently increments the technical
+iOS build number.
 
-## Manual recovery
+## Additional TestFlight builds and recovery
 
-- Run **Actions → Run iOS release** with an existing `X.Y.Z` version to rebuild and upload the
-  corresponding `vX.Y.Z` tag through EAS.
+- Run `eas workflow:run .eas/workflows/release-ios.yml --ref vX.Y.Z --wait` to build and upload
+  another TestFlight build from an existing release tag. Always pass the tag; running from
+  `main` would not reproduce the reviewed release source.
 - Re-run a failed GitHub job from its workflow page. Release finalization is idempotent when the
   existing tag already points to the merged release commit.
 - Do not submit App Review again when App Store Connect already has an active submission for the
