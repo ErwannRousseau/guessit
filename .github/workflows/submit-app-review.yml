@@ -1,0 +1,124 @@
+name: Submit App Review
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Existing TestFlight version to submit, without the v prefix
+        required: true
+        type: string
+      confirm_submission:
+        description: Confirm submission to Apple App Review
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: app-review-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  submit:
+    name: Submit iOS version to Apple
+    if: inputs.confirm_submission
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: app-store-production
+    env:
+      ASC_APP_ID: "6794387024"
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_PRIVATE_KEY_B64: ${{ secrets.ASC_PRIVATE_KEY_B64 }}
+      RELEASE_VERSION: ${{ inputs.version }}
+
+    steps:
+      - name: Validate release version
+        run: |
+          if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Version must use X.Y.Z semantic versioning."
+            exit 1
+          fi
+
+      - name: Checkout release tag
+        uses: actions/checkout@v5
+        with:
+          ref: v${{ inputs.version }}
+
+      - name: Setup App Store Connect CLI
+        uses: rudrankriyam/setup-asc@v1
+        with:
+          version: "3.1.1"
+
+      - name: Resolve latest valid build
+        id: build
+        run: |
+          BUILD_ID="$(
+            asc builds list \
+              --app "$ASC_APP_ID" \
+              --version "$RELEASE_VERSION" \
+              --platform IOS \
+              --processing-state VALID \
+              --sort=-uploadedDate \
+              --limit 1 \
+              --output json |
+              jq -er '.data[0].id'
+          )"
+          echo "id=$BUILD_ID" >>"$GITHUB_OUTPUT"
+          printf 'Selected App Store Connect build: `%s`\n' "$BUILD_ID" \
+            >>"$GITHUB_STEP_SUMMARY"
+
+      - name: Preview App Store staging
+        env:
+          BUILD_ID: ${{ steps.build.outputs.id }}
+        run: |
+          asc release stage \
+            --app "$ASC_APP_ID" \
+            --version "$RELEASE_VERSION" \
+            --build "$BUILD_ID" \
+            --metadata-dir "store-metadata/apple/version/$RELEASE_VERSION" \
+            --strict-validate \
+            --dry-run \
+            --output table
+
+      - name: Stage App Store version
+        env:
+          BUILD_ID: ${{ steps.build.outputs.id }}
+        run: |
+          asc release stage \
+            --app "$ASC_APP_ID" \
+            --version "$RELEASE_VERSION" \
+            --build "$BUILD_ID" \
+            --metadata-dir "store-metadata/apple/version/$RELEASE_VERSION" \
+            --strict-validate \
+            --confirm \
+            --output table
+
+      - name: Preview App Review submission
+        env:
+          BUILD_ID: ${{ steps.build.outputs.id }}
+        run: |
+          asc review submit \
+            --app "$ASC_APP_ID" \
+            --version "$RELEASE_VERSION" \
+            --build "$BUILD_ID" \
+            --platform IOS \
+            --dry-run \
+            --output table
+
+      - name: Submit App Review
+        env:
+          BUILD_ID: ${{ steps.build.outputs.id }}
+        run: |
+          asc review submit \
+            --app "$ASC_APP_ID" \
+            --version "$RELEASE_VERSION" \
+            --build "$BUILD_ID" \
+            --platform IOS \
+            --confirm \
+            --output table
+
+          printf 'GuessIt v%s was submitted to Apple App Review.\n' \
+            "$RELEASE_VERSION" >>"$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,104 @@
+name: Finalize release
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+permissions:
+  contents: write
+
+concurrency:
+  group: finalize-${{ github.event.pull_request.head.ref }}
+  cancel-in-progress: false
+
+jobs:
+  finalize:
+    name: Create tag and draft GitHub Release
+    if: >-
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'release/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      RELEASE_BRANCH: ${{ github.event.pull_request.head.ref }}
+      RELEASE_COMMIT: ${{ github.event.pull_request.merge_commit_sha }}
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Checkout merged release
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ env.RELEASE_COMMIT }}
+          fetch-depth: 0
+
+      - name: Validate release files
+        id: release
+        run: |
+          VERSION="${RELEASE_BRANCH#release/}"
+          TAG="v$VERSION"
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Release branch must use release/X.Y.Z."
+            exit 1
+          fi
+
+          PACKAGE_VERSION="$(jq -r '.version' package.json)"
+          APP_VERSION="$(sed -n 's/^  version: \"\\([^\"]*\\)\",$/\\1/p' app.config.ts)"
+
+          if [[ "$PACKAGE_VERSION" != "$VERSION" || "$APP_VERSION" != "$VERSION" ]]; then
+            echo "::error::Release branch, package, and Expo versions must match."
+            exit 1
+          fi
+
+          if [[ ! -f "store-metadata/releases/$VERSION.md" ]]; then
+            echo "::error::Missing versioned release notes for $VERSION."
+            exit 1
+          fi
+
+          echo "version=$VERSION" >>"$GITHUB_OUTPUT"
+          echo "tag=$TAG" >>"$GITHUB_OUTPUT"
+
+      - name: Create annotated tag
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          git fetch --tags origin
+          if git show-ref --verify --quiet "refs/tags/$TAG"; then
+            TAG_COMMIT="$(git rev-list -n 1 "$TAG")"
+            if [[ "$TAG_COMMIT" != "$RELEASE_COMMIT" ]]; then
+              echo "::error::$TAG already points to another commit."
+              exit 1
+            fi
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "$TAG" "$RELEASE_COMMIT" -m "GuessIt $TAG"
+            git push origin "$TAG"
+          fi
+
+      - name: Create draft GitHub Release
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          NOTES_FILE="store-metadata/releases/$VERSION.md"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" \
+              --draft \
+              --title "GuessIt $TAG" \
+              --notes-file "$NOTES_FILE" \
+              --verify-tag
+          else
+            gh release create "$TAG" \
+              --draft \
+              --title "GuessIt $TAG" \
+              --notes-file "$NOTES_FILE" \
+              --verify-tag
+          fi
+
+          printf 'Draft GitHub Release created for %s.\n' "$TAG" \
+            >>"$GITHUB_STEP_SUMMARY"
