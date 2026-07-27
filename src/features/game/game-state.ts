@@ -36,6 +36,7 @@ type GameAction =
   | { type: "reset" };
 
 function completeRound(game: GameState, round: Round): GameState {
+  if (game.round?.scoreApplied) return game;
   return {
     ...game,
     phase: "result",

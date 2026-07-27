@@ -120,6 +120,16 @@ describe("gameReducer", () => {
     expect(givenUp.players.map(({ score }) => score)).toEqual([0, -1, 0, 0]);
   });
 
+  test("applies each round score only once", () => {
+    const givenUp = gameReducer(activeGame({ remainingSeconds: 120 }), { type: "giveUp" });
+    const voting = gameReducer(activeGame({ remainingSeconds: 120 }), { type: "wordFound" });
+    const selected = gameReducer(voting, { type: "selectSuspect", index: 1 });
+    const revealed = gameReducer(selected, { type: "revealResult" });
+
+    expect(gameReducer(givenUp, { type: "giveUp" })).toBe(givenUp);
+    expect(gameReducer(revealed, { type: "revealResult" })).toBe(revealed);
+  });
+
   test("returns to the menu without scoring or counting an active round", () => {
     const game = activeGame({ remainingSeconds: 120 });
     const result = gameReducer(game, { type: "returnToMenu" });
