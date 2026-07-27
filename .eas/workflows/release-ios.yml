@@ -18,9 +18,7 @@ jobs:
     name: Upload iOS build to TestFlight
     needs:
       - build_ios
-    type: testflight
+    type: submit
     params:
       build_id: ${{ needs.build_ios.outputs.build_id }}
       profile: production
-      changelog: GuessIt ${{ needs.build_ios.outputs.app_version }}
-      submit_beta_review: false
