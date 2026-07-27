@@ -45,7 +45,7 @@ jobs:
           fi
 
           PACKAGE_VERSION="$(jq -r '.version' package.json)"
-          APP_VERSION="$(sed -n 's/^  version: \"\\([^\"]*\\)\",$/\\1/p' app.config.ts)"
+          APP_VERSION="$(sed -n 's/^  version: "\([^"]*\)",$/\1/p' app.config.ts)"
 
           if [[ "$PACKAGE_VERSION" != "$VERSION" || "$APP_VERSION" != "$VERSION" ]]; then
             echo "::error::Release branch, package, and Expo versions must match."
