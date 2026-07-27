@@ -1,11 +1,12 @@
 import { useEffect, useReducer, useRef } from "react";
 import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import * as StoreReview from "expo-store-review";
-import { Alert, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { colors } from "@/constants/theme";
+import { colors, radii, spacing } from "@/constants/theme";
 import { triggerHaptic } from "@/lib/haptics";
+import { Pressable } from "@/ui/pressable";
 
 import { gameReducer, initialGameState } from "@/features/game/game-state";
 import { ResultPhase } from "@/features/game/result-phase";
@@ -54,17 +55,72 @@ export function GameScreen() {
   }, [game.phase, game.roundNumber]);
 
   const resetGame = () => {
-    Alert.alert("Revenir à l’accueil ?", "Les scores de cette partie seront effacés.", [
+    Alert.alert(
+      "Commencer une nouvelle partie ?",
+      "Les joueurs, les scores et les réglages seront effacés.",
+      [
+        { text: "Annuler", style: "cancel" },
+        {
+          text: "Effacer",
+          style: "destructive",
+          onPress: () => {
+            dispatch({ type: "reset" });
+            triggerHaptic("warning");
+          },
+        },
+      ],
+    );
+  };
+
+  const removePlayer = (index: number) => {
+    const player = game.players[index];
+    if (!player) return;
+    const pointsLabel = `${player.score} point${Math.abs(player.score) === 1 ? "" : "s"}`;
+
+    Alert.alert(`Retirer ${player.name} ?`, `Son score de ${pointsLabel} sera perdu.`, [
       { text: "Annuler", style: "cancel" },
       {
-        text: "Effacer",
+        text: "Retirer",
         style: "destructive",
         onPress: () => {
-          dispatch({ type: "reset" });
+          dispatch({ type: "removePlayer", index });
           triggerHaptic("warning");
         },
       },
     ]);
+  };
+
+  const returnToMenu = () => {
+    if (game.phase === "result") {
+      dispatch({ type: "returnToMenu" });
+      return;
+    }
+
+    const timerWasRunning = game.phase === "questions" && game.round?.timerRunning === true;
+    if (timerWasRunning) {
+      dispatch({ type: "toggleTimer" });
+    }
+
+    Alert.alert(
+      "Retour au menu ?",
+      "Cette manche sera annulée. Aucun score ne sera modifié.",
+      [
+        {
+          text: "Continuer",
+          style: "cancel",
+          onPress: timerWasRunning ? () => dispatch({ type: "toggleTimer" }) : undefined,
+        },
+        {
+          text: "Retour au menu",
+          style: "destructive",
+          onPress: () => {
+            dispatch({ type: "returnToMenu" });
+            triggerHaptic("warning");
+          },
+        },
+      ],
+      { cancelable: false },
+    );
   };
 
   return (
@@ -73,62 +129,80 @@ export function GameScreen() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.flex}
       >
-        {game.phase === "setup" ? (
-          <SetupPhase
-            game={game}
-            onPlayerCountChange={(count) => dispatch({ type: "setPlayerCount", count })}
-            onPlayerNameChange={(index, name) => dispatch({ type: "setPlayerName", index, name })}
-            onCategoryChange={(categoryId) => dispatch({ type: "setCategory", categoryId })}
-            onDurationChange={(seconds) => dispatch({ type: "setDuration", seconds })}
-            onStart={() => dispatch({ type: "startRound" })}
-          />
+        {game.phase !== "setup" ? (
+          <View style={styles.menuBar}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Retour au menu"
+              haptic="selection"
+              onPress={returnToMenu}
+              style={({ pressed }) => [styles.menuButton, pressed && styles.menuButtonPressed]}
+            >
+              <Text style={styles.menuButtonText}>← Menu</Text>
+            </Pressable>
+          </View>
         ) : null}
 
-        {game.phase === "roles" && game.round ? (
-          <RoleRevealPhase
-            players={game.players}
-            round={game.round}
-            onShowRole={() => dispatch({ type: "showRole" })}
-            onHideAndContinue={() => dispatch({ type: "hideRole" })}
-          />
-        ) : null}
+        <View style={styles.flex}>
+          {game.phase === "setup" ? (
+            <SetupPhase
+              game={game}
+              onAddPlayer={() => dispatch({ type: "addPlayer" })}
+              onPlayerNameChange={(index, name) => dispatch({ type: "setPlayerName", index, name })}
+              onRemovePlayer={removePlayer}
+              onCategoryChange={(categoryId) => dispatch({ type: "setCategory", categoryId })}
+              onDurationChange={(seconds) => dispatch({ type: "setDuration", seconds })}
+              onReset={resetGame}
+              onStart={() => dispatch({ type: "startRound" })}
+            />
+          ) : null}
 
-        {game.phase === "ready" && game.round ? (
-          <ReadyPhase
-            players={game.players}
-            round={game.round}
-            roundNumber={game.roundNumber}
-            onStart={() => dispatch({ type: "startQuestions" })}
-          />
-        ) : null}
+          {game.phase === "roles" && game.round ? (
+            <RoleRevealPhase
+              players={game.players}
+              round={game.round}
+              onShowRole={() => dispatch({ type: "showRole" })}
+              onHideAndContinue={() => dispatch({ type: "hideRole" })}
+            />
+          ) : null}
 
-        {game.phase === "questions" && game.round ? (
-          <QuestionsPhase
-            players={game.players}
-            round={game.round}
-            onToggleTimer={() => dispatch({ type: "toggleTimer" })}
-            onWordFound={() => dispatch({ type: "wordFound" })}
-            onGiveUp={() => dispatch({ type: "giveUp" })}
-          />
-        ) : null}
+          {game.phase === "ready" && game.round ? (
+            <ReadyPhase
+              players={game.players}
+              round={game.round}
+              roundNumber={game.roundNumber}
+              onStart={() => dispatch({ type: "startQuestions" })}
+            />
+          ) : null}
 
-        {game.phase === "vote" && game.round ? (
-          <VotePhase
-            players={game.players}
-            round={game.round}
-            onSelect={(index) => dispatch({ type: "selectSuspect", index })}
-            onReveal={() => dispatch({ type: "revealResult" })}
-          />
-        ) : null}
+          {game.phase === "questions" && game.round ? (
+            <QuestionsPhase
+              players={game.players}
+              round={game.round}
+              onToggleTimer={() => dispatch({ type: "toggleTimer" })}
+              onWordFound={() => dispatch({ type: "wordFound" })}
+              onGiveUp={() => dispatch({ type: "giveUp" })}
+            />
+          ) : null}
 
-        {game.phase === "result" && game.round ? (
-          <ResultPhase
-            players={game.players}
-            round={game.round}
-            onNextRound={() => dispatch({ type: "startRound" })}
-            onReset={resetGame}
-          />
-        ) : null}
+          {game.phase === "vote" && game.round ? (
+            <VotePhase
+              players={game.players}
+              round={game.round}
+              onSelect={(index) => dispatch({ type: "selectSuspect", index })}
+              onReveal={() => dispatch({ type: "revealResult" })}
+            />
+          ) : null}
+
+          {game.phase === "result" && game.round ? (
+            <ResultPhase
+              players={game.players}
+              round={game.round}
+              onNextRound={() => dispatch({ type: "startRound" })}
+              onReturnToMenu={returnToMenu}
+            />
+          ) : null}
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -137,4 +211,22 @@ export function GameScreen() {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   safeArea: { flex: 1, backgroundColor: colors.background },
+  menuBar: {
+    alignItems: "flex-start",
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xs,
+  },
+  menuButton: {
+    minHeight: 42,
+    paddingHorizontal: spacing.md,
+    borderRadius: radii.pill,
+    borderCurve: "continuous",
+    borderWidth: 2,
+    borderColor: colors.dark,
+    backgroundColor: colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  menuButtonPressed: { opacity: 0.72, transform: [{ scale: 0.97 }] },
+  menuButtonText: { color: colors.ink, fontSize: 14, lineHeight: 18, fontWeight: "900" },
 });

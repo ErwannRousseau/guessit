@@ -1,6 +1,7 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
 import { colors, radii, spacing } from "@/constants/theme";
+import { Button } from "@/ui/button";
 import { Card } from "@/ui/card";
 import { Pressable } from "@/ui/pressable";
 
@@ -9,13 +10,17 @@ import type { GameState } from "./game.types";
 
 export function SetupPlayersCard({
   game,
-  onPlayerCountChange,
+  onAddPlayer,
   onPlayerNameChange,
+  onRemovePlayer,
 }: {
   game: GameState;
-  onPlayerCountChange: (count: number) => void;
+  onAddPlayer: () => void;
   onPlayerNameChange: (index: number, value: string) => void;
+  onRemovePlayer: (index: number) => void;
 }) {
+  const playerRemovalDisabled = game.playerCount <= MIN_PLAYERS;
+
   return (
     <Card>
       <View style={styles.sectionTitleRow}>
@@ -23,75 +28,53 @@ export function SetupPlayersCard({
           <Text style={styles.sectionNumberText}>1</Text>
         </View>
         <Text selectable style={styles.sectionTitle}>
-          Combien de joueurs ?
+          Joueurs
+        </Text>
+        <Text selectable style={styles.playerCountLabel}>
+          {game.playerCount}/{MAX_PLAYERS}
         </Text>
       </View>
-      <View style={styles.stepperRow}>
-        <PlayerCountButton
-          label="Retirer un joueur"
-          symbol="−"
-          disabled={game.playerCount <= MIN_PLAYERS}
-          onPress={() => onPlayerCountChange(game.playerCount - 1)}
-        />
-        <View style={styles.playerCountBlock}>
-          <Text selectable style={styles.playerCount}>
-            {game.playerCount}
-          </Text>
-          <Text selectable style={styles.playerCountLabel}>
-            joueurs
-          </Text>
-        </View>
-        <PlayerCountButton
-          label="Ajouter un joueur"
-          symbol="+"
-          disabled={game.playerCount >= MAX_PLAYERS}
-          onPress={() => onPlayerCountChange(game.playerCount + 1)}
-        />
-      </View>
-      <View style={styles.namesGrid}>
+      <View style={styles.playersList}>
         {game.players.map((player, index) => (
-          <TextInput
-            key={player.id}
-            accessibilityLabel={`Nom du joueur ${index + 1}`}
-            value={player.name}
-            onChangeText={(value) => onPlayerNameChange(index, value)}
-            maxLength={18}
-            selectTextOnFocus
-            returnKeyType="done"
-            style={styles.nameInput}
-          />
+          <View key={player.id} style={styles.playerRow}>
+            <TextInput
+              accessibilityLabel={`Nom du joueur ${index + 1}`}
+              value={player.name}
+              onChangeText={(value) => onPlayerNameChange(index, value)}
+              maxLength={18}
+              selectTextOnFocus
+              returnKeyType="done"
+              style={styles.nameInput}
+            />
+            <Text selectable style={styles.playerScore}>
+              {player.score} pt{Math.abs(player.score) === 1 ? "" : "s"}
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Retirer ${player.name}`}
+              disabled={playerRemovalDisabled}
+              haptic="warning"
+              onPress={() => onRemovePlayer(index)}
+              style={({ pressed }) => [
+                styles.removeButton,
+                pressed && styles.controlPressed,
+                playerRemovalDisabled && styles.controlDisabled,
+              ]}
+            >
+              <Text style={styles.removeSymbol}>×</Text>
+            </Pressable>
+          </View>
         ))}
       </View>
+      <Button
+        disabled={game.playerCount >= MAX_PLAYERS}
+        haptic="selection"
+        variant="secondary"
+        onPress={onAddPlayer}
+      >
+        Ajouter un joueur
+      </Button>
     </Card>
-  );
-}
-
-function PlayerCountButton({
-  label,
-  symbol,
-  disabled,
-  onPress,
-}: {
-  label: string;
-  symbol: string;
-  disabled: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      disabled={disabled}
-      haptic="selection"
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.stepperButton,
-        pressed && styles.controlPressed,
-        disabled && styles.controlDisabled,
-      ]}
-    >
-      <Text style={styles.stepperSymbol}>{symbol}</Text>
-    </Pressable>
   );
 }
 
@@ -110,38 +93,12 @@ const styles = StyleSheet.create({
   },
   sectionNumberText: { color: colors.ink, fontSize: 14, fontWeight: "900" },
   sectionTitle: { flex: 1, color: colors.ink, fontSize: 19, lineHeight: 24, fontWeight: "800" },
-  stepperRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.lg,
-  },
-  stepperButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
-    borderCurve: "continuous",
-    backgroundColor: colors.violet,
-    borderWidth: 2,
-    borderColor: colors.dark,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  stepperSymbol: { color: colors.ink, fontSize: 29, lineHeight: 32, fontWeight: "500" },
-  playerCountBlock: { minWidth: 84, alignItems: "center" },
-  playerCount: {
-    color: colors.ink,
-    fontSize: 42,
-    lineHeight: 46,
-    fontWeight: "900",
-    fontVariant: ["tabular-nums"],
-  },
-  playerCountLabel: { color: colors.muted, fontSize: 13, lineHeight: 17, fontWeight: "600" },
-  namesGrid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  playerCountLabel: { color: colors.muted, fontSize: 14, lineHeight: 18, fontWeight: "800" },
+  playersList: { gap: spacing.sm },
+  playerRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   nameInput: {
-    flexGrow: 1,
-    flexBasis: "46%",
-    minWidth: 130,
+    flex: 1,
+    minWidth: 0,
     minHeight: 46,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
@@ -154,6 +111,27 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "700",
   },
+  playerScore: {
+    minWidth: 50,
+    color: colors.muted,
+    fontSize: 13,
+    lineHeight: 17,
+    fontWeight: "800",
+    textAlign: "right",
+    fontVariant: ["tabular-nums"],
+  },
+  removeButton: {
+    width: 46,
+    height: 46,
+    borderRadius: radii.small,
+    borderCurve: "continuous",
+    borderWidth: 2,
+    borderColor: colors.dark,
+    backgroundColor: colors.primarySoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  removeSymbol: { color: colors.danger, fontSize: 27, lineHeight: 30, fontWeight: "700" },
   controlPressed: { opacity: 0.72, transform: [{ scale: 0.97 }] },
   controlDisabled: { opacity: 0.35 },
 });

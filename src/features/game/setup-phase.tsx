@@ -10,19 +10,23 @@ import { SetupPlayersCard } from "./setup-players-card";
 
 type SetupPhaseProps = {
   game: GameState;
-  onPlayerCountChange: (count: number) => void;
+  onAddPlayer: () => void;
   onPlayerNameChange: (index: number, value: string) => void;
+  onRemovePlayer: (index: number) => void;
   onCategoryChange: (category: CategoryId) => void;
   onDurationChange: (seconds: number) => void;
+  onReset: () => void;
   onStart: () => void;
 };
 
 export function SetupPhase({
   game,
-  onPlayerCountChange,
+  onAddPlayer,
   onPlayerNameChange,
+  onRemovePlayer,
   onCategoryChange,
   onDurationChange,
+  onReset,
   onStart,
 }: SetupPhaseProps) {
   return (
@@ -63,8 +67,9 @@ export function SetupPhase({
 
       <SetupPlayersCard
         game={game}
-        onPlayerCountChange={onPlayerCountChange}
+        onAddPlayer={onAddPlayer}
         onPlayerNameChange={onPlayerNameChange}
+        onRemovePlayer={onRemovePlayer}
       />
       <CategoryChoiceCard value={game.categoryId} onChange={onCategoryChange} />
       <DurationChoiceCard value={game.durationSeconds} onChange={onDurationChange} />
@@ -82,6 +87,9 @@ export function SetupPhase({
       </Card>
       <Button haptic="light" onPress={onStart}>
         Distribuer les rôles
+      </Button>
+      <Button variant="ghost" onPress={onReset}>
+        Nouvelle partie
       </Button>
       <Text selectable style={styles.legalNote}>
         Jeu original indépendant, inspiré des mécaniques classiques de mots cachés et de déduction

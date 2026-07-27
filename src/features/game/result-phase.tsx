@@ -10,20 +10,25 @@ export function ResultPhase({
   players,
   round,
   onNextRound,
-  onReset,
+  onReturnToMenu,
 }: {
   players: Player[];
   round: Round;
   onNextRound: () => void;
-  onReset: () => void;
+  onReturnToMenu: () => void;
 }) {
   const detectivesWon =
     round.endReason === "word-found" && round.suspectedIndex === round.insiderIndex;
-  const winnerTitle = detectivesWon ? "Les Enquêteurs gagnent !" : "Le Complice s’en sort !";
+  const timeExpired = round.endReason === "time-up";
+  const winnerTitle = detectivesWon
+    ? "Les Enquêteurs gagnent !"
+    : timeExpired
+      ? "Le Complice perd 1 point !"
+      : "Le Complice s’en sort !";
   const winnerDescription = detectivesWon
     ? "Le mot et le Complice ont tous les deux été trouvés."
-    : round.endReason === "time-up"
-      ? "Le groupe n’a pas trouvé le mot avant la fin du temps."
+    : timeExpired
+      ? "Le groupe n’a pas trouvé le mot avant la fin du temps imparti."
       : `${players[round.suspectedIndex ?? 0].name} a été accusé à tort.`;
 
   const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
@@ -32,7 +37,7 @@ export function ResultPhase({
     <ScrollView contentContainerStyle={styles.scrollContent}>
       <Card tone={detectivesWon ? "success" : "danger"} style={styles.resultHero}>
         <Text selectable style={styles.resultKicker}>
-          {detectivesWon ? "ENQUÊTE RÉUSSIE" : "MISSION ACCOMPLIE"}
+          {detectivesWon ? "ENQUÊTE RÉUSSIE" : timeExpired ? "TEMPS ÉCOULÉ" : "MISSION ACCOMPLIE"}
         </Text>
         <Text selectable style={styles.resultTitle}>
           {winnerTitle}
@@ -65,7 +70,7 @@ export function ResultPhase({
               {player.name}
             </Text>
             <Text selectable style={styles.scoreValue}>
-              {player.score} pt{player.score > 1 ? "s" : ""}
+              {player.score} pt{Math.abs(player.score) === 1 ? "" : "s"}
             </Text>
           </View>
         ))}
@@ -73,8 +78,8 @@ export function ResultPhase({
       <Button haptic="light" onPress={onNextRound}>
         Nouvelle manche
       </Button>
-      <Button variant="ghost" onPress={onReset}>
-        Terminer la partie
+      <Button variant="ghost" onPress={onReturnToMenu}>
+        Retour au menu
       </Button>
     </ScrollView>
   );

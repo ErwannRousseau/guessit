@@ -52,6 +52,15 @@ describe("createPlayers", () => {
       { id: "player-5", name: "Joueur 5", score: 0 },
     ]);
   });
+
+  test("creates a unique identity after a player is removed from the middle", () => {
+    const remainingPlayers = [players[0], players[2], players[3]];
+
+    expect(createPlayers(4, remainingPlayers)).toEqual([
+      ...remainingPlayers,
+      { id: "player-5", name: "Joueur 4", score: 0 },
+    ]);
+  });
 });
 
 describe("createRound", () => {
@@ -124,10 +133,10 @@ describe("applyRoundScore", () => {
     );
   });
 
-  test("awards the insider one point when time expires", () => {
+  test("deducts one point from the insider when time expires", () => {
     expect(applyRoundScore(players, round({ endReason: "time-up" }))).toEqual([
       players[0],
-      { ...players[1], score: 3 },
+      { ...players[1], score: 1 },
       players[2],
       players[3],
     ]);

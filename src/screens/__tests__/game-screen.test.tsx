@@ -54,8 +54,10 @@ describe("GameScreen", () => {
 
     expect(markup.match(/<input\b/g)).toHaveLength(4);
     expect(markup.match(/role="radio"/g)).toHaveLength(10);
-    expect(markup.match(/aria-disabled="true"/g)).toHaveLength(1);
-    expect(markup.match(/role="button"/g)).toHaveLength(3);
+    expect(markup.match(/aria-disabled="true"/g)).toHaveLength(4);
+    expect(markup.match(/role="button"/g)).toHaveLength(7);
+    expect(markup).toContain("Ajouter un joueur");
+    expect(markup).toContain("Nouvelle partie");
   });
 });
 

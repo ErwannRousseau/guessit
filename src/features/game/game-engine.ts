@@ -6,8 +6,16 @@ function randomIndex(length: number): number {
 }
 
 export function createPlayers(count: number, previousPlayers: Player[] = []): Player[] {
+  const nextPlayerNumber =
+    previousPlayers.reduce((highest, player) => {
+      const playerNumber = Number(/^player-(\d+)$/.exec(player.id)?.[1] ?? 0);
+      return Math.max(highest, playerNumber);
+    }, 0) + 1;
+
   return Array.from({ length: count }, (_, index) => ({
-    id: previousPlayers[index]?.id ?? `player-${index + 1}`,
+    id:
+      previousPlayers[index]?.id ??
+      `player-${nextPlayerNumber + Math.max(0, index - previousPlayers.length)}`,
     name: previousPlayers[index]?.name ?? `Joueur ${index + 1}`,
     score: previousPlayers[index]?.score ?? 0,
   }));
@@ -67,7 +75,7 @@ export function applyRoundScore(players: Player[], round: Round): Player[] {
     }
 
     if (index === round.insiderIndex) {
-      const points = round.endReason === "word-found" ? 2 : 1;
+      const points = round.endReason === "word-found" ? 2 : -1;
       return { ...player, score: player.score + points };
     }
 
