@@ -41,6 +41,9 @@ iOS build number.
 - Run `eas workflow:run .eas/workflows/release-ios.yml --ref vX.Y.Z --wait` to build and upload
   another TestFlight build from an existing release tag. Always pass the tag; running from
   `main` would not reproduce the reviewed release source.
+- If the build succeeds but its TestFlight upload fails, run
+  `eas submit --platform ios --id BUILD_ID --profile production --wait` to upload the existing
+  build instead of rebuilding it.
 - Re-run a failed GitHub job from its workflow page. Release finalization is idempotent when the
   existing tag already points to the merged release commit.
 - Do not submit App Review again when App Store Connect already has an active submission for the
