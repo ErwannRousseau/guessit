@@ -37,16 +37,28 @@ function activeGame(roundOverrides: Partial<Round> = {}): GameState {
 }
 
 describe("gameReducer", () => {
-  test("clamps the player count and preserves existing player data", () => {
+  test("adds players and removes the selected player while preserving everyone else", () => {
     const initial = initialGameState();
-    const named = gameReducer(initial, { type: "setPlayerName", index: 0, name: " Alice " });
-    const maximum = gameReducer(named, { type: "setPlayerCount", count: MAX_PLAYERS + 4 });
-    const minimum = gameReducer(maximum, { type: "setPlayerCount", count: MIN_PLAYERS - 4 });
+    const added = gameReducer(initial, { type: "addPlayer" });
+    const named = gameReducer(added, { type: "setPlayerName", index: 2, name: "Chloé" });
+    const removed = gameReducer(named, { type: "removePlayer", index: 1 });
 
-    expect(maximum.playerCount).toBe(MAX_PLAYERS);
-    expect(maximum.players[0].name).toBe(" Alice ");
-    expect(minimum.playerCount).toBe(MIN_PLAYERS);
-    expect(minimum.players).toHaveLength(MIN_PLAYERS);
+    expect(added.players.at(-1)).toEqual({ id: "player-5", name: "Joueur 5", score: 0 });
+    expect(removed.playerCount).toBe(MIN_PLAYERS);
+    expect(removed.players.map(({ id }) => id)).toEqual([
+      "player-1",
+      "player-3",
+      "player-4",
+      "player-5",
+    ]);
+    expect(removed.players[1].name).toBe("Chloé");
+    expect(gameReducer(removed, { type: "removePlayer", index: 0 })).toBe(removed);
+
+    let maximum = removed;
+    while (maximum.playerCount < MAX_PLAYERS) {
+      maximum = gameReducer(maximum, { type: "addPlayer" });
+    }
+    expect(gameReducer(maximum, { type: "addPlayer" })).toBe(maximum);
   });
 
   test("advances private role reveals to the ready phase", () => {
@@ -64,7 +76,7 @@ describe("gameReducer", () => {
     expect(game.round?.roleVisible).toBe(false);
   });
 
-  test("ends the round and awards the insider when the timer expires", () => {
+  test("ends the round and penalizes the insider when the timer expires", () => {
     const result = gameReducer(activeGame(), { type: "timerTick" });
 
     expect(result.phase).toBe("result");
@@ -74,7 +86,7 @@ describe("gameReducer", () => {
       endReason: "time-up",
       scoreApplied: true,
     });
-    expect(result.players.map(({ score }) => score)).toEqual([0, 1, 0, 0]);
+    expect(result.players.map(({ score }) => score)).toEqual([0, -1, 0, 0]);
   });
 
   test("pauses and resumes timer ticks", () => {
@@ -98,14 +110,32 @@ describe("gameReducer", () => {
     expect(result.players.map(({ score }) => score)).toEqual([1, 0, 1, 1]);
   });
 
-  test("awards the insider for a wrong accusation and for giving up", () => {
+  test("awards the insider for a wrong accusation and penalizes them for giving up", () => {
     const voting = gameReducer(activeGame({ remainingSeconds: 120 }), { type: "wordFound" });
     const selected = gameReducer(voting, { type: "selectSuspect", index: 2 });
     const wrongAccusation = gameReducer(selected, { type: "revealResult" });
     const givenUp = gameReducer(activeGame({ remainingSeconds: 120 }), { type: "giveUp" });
 
     expect(wrongAccusation.players.map(({ score }) => score)).toEqual([0, 2, 0, 0]);
-    expect(givenUp.players.map(({ score }) => score)).toEqual([0, 1, 0, 0]);
+    expect(givenUp.players.map(({ score }) => score)).toEqual([0, -1, 0, 0]);
+  });
+
+  test("returns to the menu without scoring or counting an active round", () => {
+    const game = activeGame({ remainingSeconds: 120 });
+    const result = gameReducer(game, { type: "returnToMenu" });
+    const initial = initialGameState();
+
+    expect(result).toMatchObject({ phase: "setup", round: null, roundNumber: 0 });
+    expect(result.players).toBe(game.players);
+    expect(gameReducer(initial, { type: "returnToMenu" })).toBe(initial);
+  });
+
+  test("returns to the menu while preserving a completed round and its scores", () => {
+    const completed = gameReducer(activeGame({ remainingSeconds: 120 }), { type: "giveUp" });
+    const result = gameReducer(completed, { type: "returnToMenu" });
+
+    expect(result).toMatchObject({ phase: "setup", round: null, roundNumber: 1 });
+    expect(result.players.map(({ score }) => score)).toEqual([0, -1, 0, 0]);
   });
 
   test("preserves scores when starting the next round", () => {
@@ -116,7 +146,7 @@ describe("gameReducer", () => {
 
     expect(nextRound.phase).toBe("roles");
     expect(nextRound.roundNumber).toBe(2);
-    expect(nextRound.players.map(({ score }) => score)).toEqual([0, 1, 0, 0]);
+    expect(nextRound.players.map(({ score }) => score)).toEqual([0, -1, 0, 0]);
     expect(nextRound.round?.masterIndex).not.toBe(nextRound.round?.insiderIndex);
   });
 

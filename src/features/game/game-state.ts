@@ -17,7 +17,8 @@ export function initialGameState(): GameState {
 }
 
 type GameAction =
-  | { type: "setPlayerCount"; count: number }
+  | { type: "addPlayer" }
+  | { type: "removePlayer"; index: number }
   | { type: "setPlayerName"; index: number; name: string }
   | { type: "setCategory"; categoryId: CategoryId }
   | { type: "setDuration"; seconds: number }
@@ -31,6 +32,7 @@ type GameAction =
   | { type: "giveUp" }
   | { type: "selectSuspect"; index: number }
   | { type: "revealResult" }
+  | { type: "returnToMenu" }
   | { type: "reset" };
 
 function completeRound(game: GameState, round: Round): GameState {
@@ -44,13 +46,25 @@ function completeRound(game: GameState, round: Round): GameState {
 
 export function gameReducer(game: GameState, action: GameAction): GameState {
   switch (action.type) {
-    case "setPlayerCount": {
-      const playerCount = Math.min(MAX_PLAYERS, Math.max(MIN_PLAYERS, action.count));
+    case "addPlayer": {
+      if (game.playerCount >= MAX_PLAYERS) return game;
+      const playerCount = game.playerCount + 1;
       return {
         ...game,
         playerCount,
         players: createPlayers(playerCount, game.players),
       };
+    }
+    case "removePlayer": {
+      if (
+        game.playerCount <= MIN_PLAYERS ||
+        action.index < 0 ||
+        action.index >= game.players.length
+      ) {
+        return game;
+      }
+      const players = game.players.filter((_, index) => index !== action.index);
+      return { ...game, playerCount: players.length, players };
     }
     case "setPlayerName":
       return {
@@ -148,6 +162,14 @@ export function gameReducer(game: GameState, action: GameAction): GameState {
       if (!game.round || game.round.suspectedIndex === null) return game;
       return completeRound(game, { ...game.round, scoreApplied: true });
     }
+    case "returnToMenu":
+      if (game.phase === "setup") return game;
+      return {
+        ...game,
+        phase: "setup",
+        round: null,
+        roundNumber: game.phase === "result" ? game.roundNumber : Math.max(0, game.roundNumber - 1),
+      };
     case "reset":
       return initialGameState();
     default: {
