@@ -3,7 +3,7 @@ name: Release iOS to TestFlight
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v*.*.*"
   workflow_dispatch: {}
 
 jobs:
@@ -22,5 +22,5 @@ jobs:
     params:
       build_id: ${{ needs.build_ios.outputs.build_id }}
       profile: production
-      changelog: GuessIt ${{ github.ref_name }}
+      changelog: GuessIt ${{ needs.build_ios.outputs.app_version }}
       submit_beta_review: false
