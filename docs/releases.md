@@ -27,7 +27,7 @@ in [ADR 0002](adr/0002-automate-releases-from-github.md).
 1. Open **Actions → Prepare release → Run workflow** from `main`.
 2. Enter the public `X.Y.Z` version and the French release notes.
 3. Review the generated `release/X.Y.Z` pull request, approve its CI run, then squash-merge it.
-4. The merge creates the annotated `vX.Y.Z` tag.
+4. The merge creates the annotated `vX.Y.Z` tag and publishes its GitHub Release.
 5. The tag automatically starts the EAS iOS production build and uploads it to TestFlight.
 6. After testing the build, open **Actions → Submit App Review → Run workflow**, enter `X.Y.Z`,
    and check the submission confirmation.
