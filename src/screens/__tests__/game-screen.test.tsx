@@ -87,16 +87,17 @@ describe("GameScreen", () => {
 });
 
 describe("LandingScreen", () => {
-  test("prioritizes direct web play over unavailable stores", () => {
+  test("prioritizes mobile downloads before web play", () => {
     const markup = renderToStaticMarkup(<LandingScreen />);
 
-    expect(markup.match(/aria-disabled="true"/g)).toHaveLength(2);
-    expect(markup).toContain("Version iPhone");
-    expect(markup).toContain("Version Android");
-    expect(markup).toContain("COMING SOON");
+    expect(markup.match(/aria-disabled="true"/g)).toHaveLength(4);
+    expect(markup).toContain("Télécharger sur l’App Store");
+    expect(markup).toContain("Télécharger sur Google Play");
+    expect(markup).toContain("Bientôt disponible");
+    expect(markup).toContain(">iOS<");
+    expect(markup).toContain(">Android<");
     expect(markup).toContain('href="/play"');
-    expect(markup).toContain("Jouer maintenant");
-    expect(markup).toContain("Commencer une partie");
+    expect(markup).toContain("Jouer sur le web");
   });
 });
 

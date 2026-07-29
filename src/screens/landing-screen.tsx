@@ -71,8 +71,8 @@ const faqs = [
     answer: "De 4 à 10 joueurs autour d’un seul téléphone.",
   },
   {
-    question: "Faut-il installer une application ?",
-    answer: "Non. La version web se lance directement dans votre navigateur.",
+    question: "Peut-on jouer sans installer l’application ?",
+    answer: "Oui. La version web reste disponible pendant que les apps iOS et Android arrivent.",
   },
   {
     question: "Combien de temps dure une manche ?",
@@ -89,7 +89,7 @@ export function LandingScreen() {
         <title>GuessIt : Le Complice</title>
         <meta
           name="description"
-          content="Le jeu de bluff et de déduction pour vos soirées, sur un seul téléphone."
+          content="Découvrez GuessIt, le jeu de bluff et de déduction pour vos soirées, sur iOS, Android et web."
         />
       </Head>
 
@@ -121,11 +121,19 @@ export function LandingScreen() {
                   Le jeu parfait pour lancer une soirée en 30 secondes.
                 </Text>
 
+                <View style={styles.downloads}>
+                  <Text style={styles.downloadsLabel}>TÉLÉCHARGER L’APPLICATION</Text>
+                  <View style={[styles.storeList, !isSmall && styles.storeListWide]}>
+                    <StoreDownloadCard platform="iOS" />
+                    <StoreDownloadCard platform="Android" />
+                  </View>
+                </View>
+
                 <View style={[styles.heroAction, !isSmall && styles.heroActionWide]}>
                   <Link href="/play" asChild>
-                    <Button>Jouer maintenant</Button>
+                    <Button variant="secondary">Jouer sur le web</Button>
                   </Link>
-                  <Text style={styles.actionNote}>Gratuit · sans compte · sans installation</Text>
+                  <Text style={styles.actionNote}>Disponible maintenant · sans installation</Text>
                 </View>
 
                 <View style={styles.factList}>
@@ -218,17 +226,17 @@ export function LandingScreen() {
                   Qui sera le meilleur Complice ?
                 </Text>
                 <Text style={styles.finalSubtitle}>
-                  Posez le téléphone au centre de la table et lancez votre première manche.
+                  Retrouvez bientôt GuessIt sur iOS et Android, ou lancez la version web maintenant.
                 </Text>
               </View>
               <View style={styles.finalAction}>
-                <Link href="/play" asChild>
-                  <Button>Commencer une partie</Button>
-                </Link>
                 <View style={styles.storeList}>
-                  <StoreCard platform="iPhone" />
-                  <StoreCard platform="Android" />
+                  <StoreDownloadCard platform="iOS" />
+                  <StoreDownloadCard platform="Android" />
                 </View>
+                <Link href="/play" asChild>
+                  <Button variant="secondary">Jouer sur le web</Button>
+                </Link>
               </View>
             </View>
           </View>
@@ -258,10 +266,12 @@ function SectionHeader({
   );
 }
 
-function StoreCard({ platform }: { platform: "iPhone" | "Android" }) {
+function StoreDownloadCard({ platform }: { platform: "iOS" | "Android" }) {
+  const storeName = platform === "iOS" ? "l’App Store" : "Google Play";
+
   return (
     <Pressable
-      accessibilityLabel={`Version ${platform}, bientôt disponible`}
+      accessibilityLabel={`Téléchargement ${platform}, bientôt disponible`}
       accessibilityRole="button"
       accessibilityState={{ disabled: true }}
       disabled
@@ -269,8 +279,11 @@ function StoreCard({ platform }: { platform: "iPhone" | "Android" }) {
     >
       <Image source={appIcon} style={styles.storeIcon} />
       <View style={styles.storeCopy}>
-        <Text style={styles.storePlatform}>{platform}</Text>
-        <Text style={styles.storeStatus}>COMING SOON</Text>
+        <View style={[styles.storeTag, platform === "Android" && styles.storeTagAndroid]}>
+          <Text style={styles.storeTagText}>{platform}</Text>
+        </View>
+        <Text style={styles.storeTitle}>Télécharger sur {storeName}</Text>
+        <Text style={styles.storeStatus}>Bientôt disponible</Text>
       </View>
     </Pressable>
   );
@@ -359,6 +372,19 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 24,
     fontWeight: "900",
+  },
+  downloads: {
+    width: "100%",
+    maxWidth: 600,
+    gap: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  downloadsLabel: {
+    color: colors.ink,
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: "900",
+    letterSpacing: 1.2,
   },
   heroAction: {
     width: "100%",
@@ -604,31 +630,49 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   storeList: {
-    flexDirection: "row",
     gap: spacing.sm,
+  },
+  storeListWide: {
+    flexDirection: "row",
   },
   storeCard: {
     flex: 1,
-    minHeight: 64,
+    minHeight: 92,
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
-    padding: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.onDarkMuted,
+    padding: spacing.md,
+    borderWidth: 2,
+    borderColor: colors.dark,
     borderRadius: radii.medium,
     backgroundColor: colors.surface,
-    opacity: 0.62,
   },
   storeIcon: {
-    width: 34,
-    height: 34,
-    borderRadius: 8,
+    width: 46,
+    height: 46,
+    borderRadius: radii.small,
   },
   storeCopy: {
     flex: 1,
+    alignItems: "flex-start",
+    gap: 2,
   },
-  storePlatform: {
+  storeTag: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: radii.pill,
+    backgroundColor: colors.violetSoft,
+  },
+  storeTagAndroid: {
+    backgroundColor: colors.accentSoft,
+  },
+  storeTagText: {
+    color: colors.ink,
+    fontSize: 10,
+    lineHeight: 14,
+    fontWeight: "900",
+  },
+  storeTitle: {
     color: colors.ink,
     fontSize: 13,
     lineHeight: 17,
@@ -636,9 +680,8 @@ const styles = StyleSheet.create({
   },
   storeStatus: {
     color: colors.muted,
-    fontSize: 9,
-    lineHeight: 13,
-    fontWeight: "900",
-    letterSpacing: 0.7,
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: "700",
   },
 });
