@@ -53,13 +53,6 @@ docs/
 - npm/yarn lockfiles or dependency edits outside Bun.
 - Speculative barrels; import concrete modules.
 
-## PROJECT WORKFLOWS
-
-- GitHub Issues use `gh`; see `docs/agents/issue-tracker.md`.
-- Read current triage labels in `docs/agents/triage-labels.md`.
-- Domain docs use root `CONTEXT.md` and `docs/adr/` when present; see `docs/agents/domain.md`.
-- Read current commands from `package.json`; do not rely on copied command lists.
-
 ## NOTES
 
 - Game runs offline; word data is source-controlled.

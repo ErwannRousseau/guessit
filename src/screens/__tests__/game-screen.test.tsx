@@ -15,7 +15,18 @@ mock.module("react-native-safe-area-context", () => ({
 }));
 mock.module("../../../assets/images/icon.png", () => ({ default: "/guessit-icon.png" }));
 mock.module("../../../assets/images/logo-mark.png", () => ({ default: "/guessit-mark.png" }));
+mock.module("../../../assets/images/splash-lockup.png", () => ({
+  default: "/guessit-lockup.png",
+}));
 mock.module("../../../assets/sounds/timer-finished.wav", () => ({ default: 1 }));
+mock.module("expo-router", () => ({
+  Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
+  ),
+}));
+mock.module("expo-router/head", () => ({
+  default: ({ children }: { children: React.ReactNode }) => children,
+}));
 mock.module("expo-audio", () => ({
   setAudioModeAsync: async () => {},
   useAudioPlayer: () => ({ play: () => {}, seekTo: async () => {} }),
@@ -33,11 +44,13 @@ mock.module("expo-store-review", () => ({
 }));
 
 let GameScreen: typeof import("@/screens/game-screen").GameScreen;
+let LandingScreen: typeof import("@/screens/landing-screen").LandingScreen;
 let Platform: typeof import("react-native").Platform;
 let Pressable: typeof import("@/ui/pressable").Pressable;
 
 beforeAll(async () => {
   ({ GameScreen } = await import("@/screens/game-screen"));
+  ({ LandingScreen } = await import("@/screens/landing-screen"));
   ({ Platform } = await import("react-native"));
   ({ Pressable } = await import("@/ui/pressable"));
 });
@@ -58,6 +71,19 @@ describe("GameScreen", () => {
     expect(markup.match(/role="button"/g)).toHaveLength(7);
     expect(markup).toContain("Ajouter un joueur");
     expect(markup).toContain("Nouvelle partie");
+  });
+});
+
+describe("LandingScreen", () => {
+  test("prioritizes store availability before direct web play", () => {
+    const markup = renderToStaticMarkup(<LandingScreen />);
+
+    expect(markup.match(/aria-disabled="true"/g)).toHaveLength(2);
+    expect(markup).toContain("Version iPhone");
+    expect(markup).toContain("Version Android");
+    expect(markup).toContain("Bientôt disponible");
+    expect(markup).toContain('href="/play"');
+    expect(markup).toContain("Jouer sur le web");
   });
 });
 
