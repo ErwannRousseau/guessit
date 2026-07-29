@@ -1,11 +1,12 @@
 import { useEffect, useReducer, useRef } from "react";
 import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import * as StoreReview from "expo-store-review";
-import { Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, View } from "react-native";
+import { Alert, KeyboardAvoidingView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors, radii, spacing } from "@/constants/theme";
 import { triggerHaptic } from "@/lib/haptics";
+import { isIOS } from "@/lib/platform";
 import { Pressable } from "@/ui/pressable";
 
 import { gameReducer, initialGameState } from "@/features/game/game-state";
@@ -125,10 +126,7 @@ export function GameScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.flex}
-      >
+      <KeyboardAvoidingView behavior={isIOS() ? "padding" : undefined} style={styles.flex}>
         {game.phase !== "setup" ? (
           <View style={styles.menuBar}>
             <Pressable

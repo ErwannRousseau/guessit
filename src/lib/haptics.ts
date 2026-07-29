@@ -1,10 +1,11 @@
 import * as Haptics from "expo-haptics";
-import { Platform } from "react-native";
+
+import { isWeb } from "@/lib/platform";
 
 export type HapticFeedback = "selection" | "light" | "medium" | "success" | "warning";
 
 export function triggerHaptic(feedback?: HapticFeedback) {
-  if (!feedback || Platform.OS === "web") {
+  if (!feedback || isWeb()) {
     return;
   }
 
