@@ -18,6 +18,18 @@ mock.module("../../../assets/images/logo-mark.png", () => ({ default: "/guessit-
 mock.module("../../../assets/images/splash-lockup.png", () => ({
   default: "/guessit-lockup.png",
 }));
+mock.module("../../../store-assets/apple/iphone/1320x2868/fr-FR/01-hero.png", () => ({
+  default: "/guessit-setup.png",
+}));
+mock.module("../../../store-assets/apple/iphone/1320x2868/fr-FR/02-device-bottom.png", () => ({
+  default: "/guessit-role.png",
+}));
+mock.module("../../../store-assets/apple/iphone/1320x2868/fr-FR/04-device-top.png", () => ({
+  default: "/guessit-timer.png",
+}));
+mock.module("../../../store-assets/apple/iphone/1320x2868/fr-FR/06-device-bottom.png", () => ({
+  default: "/guessit-score.png",
+}));
 mock.module("../../../assets/sounds/timer-finished.wav", () => ({ default: 1 }));
 mock.module("expo-router", () => ({
   Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
@@ -75,15 +87,16 @@ describe("GameScreen", () => {
 });
 
 describe("LandingScreen", () => {
-  test("prioritizes store availability before direct web play", () => {
+  test("prioritizes direct web play over unavailable stores", () => {
     const markup = renderToStaticMarkup(<LandingScreen />);
 
     expect(markup.match(/aria-disabled="true"/g)).toHaveLength(2);
     expect(markup).toContain("Version iPhone");
     expect(markup).toContain("Version Android");
-    expect(markup).toContain("Bientôt disponible");
+    expect(markup).toContain("COMING SOON");
     expect(markup).toContain('href="/play"');
-    expect(markup).toContain("Jouer sur le web");
+    expect(markup).toContain("Jouer maintenant");
+    expect(markup).toContain("Commencer une partie");
   });
 });
 
