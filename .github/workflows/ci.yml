@@ -41,3 +41,6 @@ jobs:
 
       - name: Test
         run: bun run test
+
+      - name: Export web
+        run: bun run export:web
