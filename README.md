@@ -20,8 +20,6 @@ A local hidden-word and social-deduction mobile game built with **Expo**, **Reac
    gives up, the Insider wins the round.
 5. Points and rankings are calculated automatically and carried over to the next round.
 
-The game contains 144 words across 6 categories and works offline.
-
 ## Development
 
 Requirements: [Bun](https://bun.com/) 1.3.14 and the Expo Go app, or an iOS/Android
@@ -42,11 +40,6 @@ bun run format:check
 bun run lint
 bun run test
 bun run typecheck
-```
-
-To apply Oxfmt formatting automatically:
-
-```bash
 bun run format
 ```
 
@@ -63,10 +56,6 @@ To generate the static web export:
 ```bash
 bun run export:web
 ```
-
-`oxfmt.config.ts` sets the line width to 100 characters. `oxlint.config.ts` enables the
-TypeScript, React, and React Performance rules, along with the React Doctor recommendations for
-React and React Native.
 
 The structural conventions are detailed in
 [docs/architecture.md](./docs/architecture.md).
