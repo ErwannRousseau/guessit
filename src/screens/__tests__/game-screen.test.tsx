@@ -1,59 +1,7 @@
-import { beforeAll, beforeEach, describe, expect, mock, test } from "bun:test";
+import { beforeAll, beforeEach, describe, expect, test } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import * as ReactNativeWeb from "react-native-web";
 
-const impactAsync = mock(async () => {});
-const notificationAsync = mock(async () => {});
-const selectionAsync = mock(async () => {});
-
-mock.module("react-native", () => ({
-  ...ReactNativeWeb,
-  Platform: { OS: "ios" },
-}));
-mock.module("react-native-safe-area-context", () => ({
-  SafeAreaView: ReactNativeWeb.View,
-}));
-mock.module("../../../assets/images/icon.png", () => ({ default: "/guessit-icon.png" }));
-mock.module("../../../assets/images/logo-mark.png", () => ({ default: "/guessit-mark.png" }));
-mock.module("../../../assets/images/splash-lockup.png", () => ({
-  default: "/guessit-lockup.png",
-}));
-mock.module("../../../store-assets/apple/iphone/1320x2868/fr-FR/01-hero.png", () => ({
-  default: "/guessit-setup.png",
-}));
-mock.module("../../../store-assets/apple/iphone/1320x2868/fr-FR/02-device-bottom.png", () => ({
-  default: "/guessit-role.png",
-}));
-mock.module("../../../store-assets/apple/iphone/1320x2868/fr-FR/04-device-top.png", () => ({
-  default: "/guessit-timer.png",
-}));
-mock.module("../../../store-assets/apple/iphone/1320x2868/fr-FR/06-device-bottom.png", () => ({
-  default: "/guessit-score.png",
-}));
-mock.module("../../../assets/sounds/timer-finished.wav", () => ({ default: 1 }));
-mock.module("expo-router", () => ({
-  Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
-  ),
-}));
-mock.module("expo-router/head", () => ({
-  default: ({ children }: { children: React.ReactNode }) => children,
-}));
-mock.module("expo-audio", () => ({
-  setAudioModeAsync: async () => {},
-  useAudioPlayer: () => ({ play: () => {}, seekTo: async () => {} }),
-}));
-mock.module("expo-haptics", () => ({
-  ImpactFeedbackStyle: { Light: "light", Medium: "medium" },
-  NotificationFeedbackType: { Success: "success", Warning: "warning" },
-  impactAsync,
-  notificationAsync,
-  selectionAsync,
-}));
-mock.module("expo-store-review", () => ({
-  isAvailableAsync: async () => false,
-  requestReview: async () => {},
-}));
+import { impactAsync, notificationAsync, selectionAsync } from "@/test/platform-test-setup";
 
 let GameScreen: typeof import("@/screens/game-screen").GameScreen;
 let LandingScreen: typeof import("@/screens/landing-screen").LandingScreen;
@@ -68,6 +16,7 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
+  Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" });
   impactAsync.mockClear();
   notificationAsync.mockClear();
   selectionAsync.mockClear();
@@ -83,6 +32,20 @@ describe("GameScreen", () => {
     expect(markup.match(/role="button"/g)).toHaveLength(7);
     expect(markup).toContain("Ajouter un joueur");
     expect(markup).toContain("Nouvelle partie");
+  });
+
+  test("enables keyboard avoidance on iOS", () => {
+    const markup = renderToStaticMarkup(<GameScreen />);
+
+    expect(markup).toContain('data-keyboard-behavior="padding"');
+  });
+
+  test("leaves keyboard avoidance disabled on web", () => {
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "web" });
+
+    const markup = renderToStaticMarkup(<GameScreen />);
+
+    expect(markup).toContain('data-keyboard-behavior="none"');
   });
 });
 
@@ -121,7 +84,6 @@ describe("Pressable", () => {
     press("warning");
 
     expect(notificationAsync).not.toHaveBeenCalled();
-    Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" });
   });
 
   test("maps each haptic prop to its native effect", () => {
