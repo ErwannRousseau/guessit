@@ -10,11 +10,7 @@ import { isIOS } from "@/lib/platform";
 import { Pressable } from "@/ui/pressable";
 
 import { gameReducer, initialGameState } from "@/features/game/game-state";
-import { ResultPhase } from "@/features/game/result-phase";
-import { RoleRevealPhase } from "@/features/game/role-reveal-phase";
-import { QuestionsPhase, ReadyPhase } from "@/features/game/round-phases";
-import { SetupPhase } from "@/features/game/setup-phase";
-import { VotePhase } from "@/features/game/vote-phase";
+import { PartieFlow } from "@/features/game/partie-flow";
 
 export function GameScreen() {
   const [game, dispatch] = useReducer(gameReducer, undefined, initialGameState);
@@ -142,65 +138,13 @@ export function GameScreen() {
         ) : null}
 
         <View style={styles.flex}>
-          {game.phase === "setup" ? (
-            <SetupPhase
-              game={game}
-              onAddPlayer={() => dispatch({ type: "addPlayer" })}
-              onPlayerNameChange={(index, name) => dispatch({ type: "setPlayerName", index, name })}
-              onRemovePlayer={removePlayer}
-              onCategoryChange={(categoryId) => dispatch({ type: "setCategory", categoryId })}
-              onDurationChange={(seconds) => dispatch({ type: "setDuration", seconds })}
-              onReset={resetGame}
-              onStart={() => dispatch({ type: "startRound" })}
-            />
-          ) : null}
-
-          {game.phase === "roles" && game.round ? (
-            <RoleRevealPhase
-              players={game.players}
-              round={game.round}
-              onShowRole={() => dispatch({ type: "showRole" })}
-              onHideAndContinue={() => dispatch({ type: "hideRole" })}
-            />
-          ) : null}
-
-          {game.phase === "ready" && game.round ? (
-            <ReadyPhase
-              players={game.players}
-              round={game.round}
-              roundNumber={game.roundNumber}
-              onStart={() => dispatch({ type: "startQuestions" })}
-            />
-          ) : null}
-
-          {game.phase === "questions" && game.round ? (
-            <QuestionsPhase
-              players={game.players}
-              round={game.round}
-              onToggleTimer={() => dispatch({ type: "toggleTimer" })}
-              onWordFound={() => dispatch({ type: "wordFound" })}
-              onGiveUp={() => dispatch({ type: "giveUp" })}
-            />
-          ) : null}
-
-          {game.phase === "vote" && game.round ? (
-            <VotePhase
-              players={game.players}
-              round={game.round}
-              onSelect={(index) => dispatch({ type: "selectSuspect", index })}
-              onReveal={() => dispatch({ type: "revealResult" })}
-            />
-          ) : null}
-
-          {game.phase === "result" && game.round?.outcome ? (
-            <ResultPhase
-              players={game.players}
-              round={game.round}
-              outcome={game.round.outcome}
-              onNextRound={() => dispatch({ type: "startRound" })}
-              onReturnToMenu={returnToMenu}
-            />
-          ) : null}
+          <PartieFlow
+            game={game}
+            dispatch={dispatch}
+            onRemovePlayer={removePlayer}
+            onReset={resetGame}
+            onReturnToMenu={returnToMenu}
+          />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

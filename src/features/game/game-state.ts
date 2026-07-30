@@ -17,7 +17,7 @@ export function initialGameState(): GameState {
   };
 }
 
-type GameAction =
+export type GameAction =
   | { type: "addPlayer" }
   | { type: "removePlayer"; index: number }
   | { type: "setPlayerName"; index: number; name: string }
