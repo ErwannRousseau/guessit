@@ -8,7 +8,7 @@ import { QuestionsPhase, ReadyPhase } from "@/features/game/round-phases";
 import { SetupPhase } from "@/features/game/setup-phase";
 import { VotePhase } from "@/features/game/vote-phase";
 
-type PartieFlowProps = {
+type PartieFlowPhaseProps = {
   game: GameState;
   dispatch: Dispatch<GameAction>;
   onRemovePlayer: (index: number) => void;
@@ -16,13 +16,13 @@ type PartieFlowProps = {
   onReturnToMenu: () => void;
 };
 
-export function PartieFlow({
+export function PartieFlowPhase({
   game,
   dispatch,
   onRemovePlayer,
   onReset,
   onReturnToMenu,
-}: PartieFlowProps) {
+}: PartieFlowPhaseProps) {
   switch (game.phase) {
     case "setup":
       return (

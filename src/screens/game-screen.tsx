@@ -10,7 +10,7 @@ import { isIOS } from "@/lib/platform";
 import { Pressable } from "@/ui/pressable";
 
 import { gameReducer, initialGameState } from "@/features/game/game-state";
-import { PartieFlow } from "@/features/game/partie-flow";
+import { PartieFlowPhase } from "@/features/game/partie-flow-phase";
 
 export function GameScreen() {
   const [game, dispatch] = useReducer(gameReducer, undefined, initialGameState);
@@ -138,7 +138,7 @@ export function GameScreen() {
         ) : null}
 
         <View style={styles.flex}>
-          <PartieFlow
+          <PartieFlowPhase
             game={game}
             dispatch={dispatch}
             onRemovePlayer={removePlayer}
