@@ -2,10 +2,10 @@ import type { Dispatch } from "react";
 
 import type { GameAction } from "@/features/game/game-state";
 import type { GameState } from "@/features/game/game.types";
+import { MenuPrincipalPhase } from "@/features/game/menu-principal-phase";
 import { ResultPhase } from "@/features/game/result-phase";
 import { RoleRevealPhase } from "@/features/game/role-reveal-phase";
 import { QuestionsPhase, ReadyPhase } from "@/features/game/round-phases";
-import { SetupPhase } from "@/features/game/setup-phase";
 import { VotePhase } from "@/features/game/vote-phase";
 
 type PartieFlowPhaseProps = {
@@ -26,15 +26,11 @@ export function PartieFlowPhase({
   switch (game.phase) {
     case "setup":
       return (
-        <SetupPhase
+        <MenuPrincipalPhase
           game={game}
-          onAddPlayer={() => dispatch({ type: "addPlayer" })}
-          onPlayerNameChange={(index, name) => dispatch({ type: "setPlayerName", index, name })}
+          dispatch={dispatch}
           onRemovePlayer={onRemovePlayer}
-          onCategoryChange={(categoryId) => dispatch({ type: "setCategory", categoryId })}
-          onDurationChange={(seconds) => dispatch({ type: "setDuration", seconds })}
           onReset={onReset}
-          onStart={() => dispatch({ type: "startRound" })}
         />
       );
     case "roles":

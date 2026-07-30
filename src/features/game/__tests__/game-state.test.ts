@@ -61,6 +61,23 @@ describe("gameReducer", () => {
     expect(gameReducer(maximum, { type: "addPlayer" })).toBe(maximum);
   });
 
+  test("starts a round with trimmed names and selected settings", () => {
+    const initial = initialGameState();
+    const named = gameReducer(initial, { type: "setPlayerName", index: 0, name: "  Alice  " });
+    const blank = gameReducer(named, { type: "setPlayerName", index: 1, name: "  " });
+    const categorized = gameReducer(blank, { type: "setCategory", categoryId: "objects" });
+    const configured = gameReducer(categorized, { type: "setDuration", seconds: 180 });
+    const started = gameReducer(configured, { type: "startRound" });
+
+    expect(started.phase).toBe("roles");
+    expect(started.players[0].name).toBe("Alice");
+    expect(started.players[1].name).toBe("Joueur 2");
+    expect(started.round).toMatchObject({
+      categoryId: "objects",
+      remainingSeconds: 180,
+    });
+  });
+
   test("advances private role reveals to the ready phase", () => {
     let game: GameState = { ...activeGame(), phase: "roles" };
 
