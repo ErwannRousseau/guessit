@@ -1,10 +1,11 @@
 import { useEffect, useReducer, useRef } from "react";
 import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import * as StoreReview from "expo-store-review";
-import { Alert, KeyboardAvoidingView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors, radii, spacing } from "@/constants/theme";
+import { confirmAction } from "@/lib/confirmation";
 import { triggerHaptic } from "@/lib/haptics";
 import { isIOS } from "@/lib/platform";
 import { Pressable } from "@/ui/pressable";
@@ -52,21 +53,16 @@ export function GameScreen() {
   }, [game.phase, game.roundNumber]);
 
   const resetGame = () => {
-    Alert.alert(
-      "Commencer une nouvelle partie ?",
-      "Les joueurs, les scores et les réglages seront effacés.",
-      [
-        { text: "Annuler", style: "cancel" },
-        {
-          text: "Effacer",
-          style: "destructive",
-          onPress: () => {
-            dispatch({ type: "reset" });
-            triggerHaptic("warning");
-          },
-        },
-      ],
-    );
+    confirmAction({
+      title: "Commencer une nouvelle partie ?",
+      message: "Les joueurs, les scores et les réglages seront effacés.",
+      confirmText: "Effacer",
+      cancelText: "Annuler",
+      onConfirm: () => {
+        dispatch({ type: "reset" });
+        triggerHaptic("warning");
+      },
+    });
   };
 
   const removePlayer = (index: number) => {
@@ -74,17 +70,16 @@ export function GameScreen() {
     if (!player) return;
     const pointsLabel = `${player.score} point${Math.abs(player.score) === 1 ? "" : "s"}`;
 
-    Alert.alert(`Retirer ${player.name} ?`, `Son score de ${pointsLabel} sera perdu.`, [
-      { text: "Annuler", style: "cancel" },
-      {
-        text: "Retirer",
-        style: "destructive",
-        onPress: () => {
-          dispatch({ type: "removePlayer", index });
-          triggerHaptic("warning");
-        },
+    confirmAction({
+      title: `Retirer ${player.name} ?`,
+      message: `Son score de ${pointsLabel} sera perdu.`,
+      confirmText: "Retirer",
+      cancelText: "Annuler",
+      onConfirm: () => {
+        dispatch({ type: "removePlayer", index });
+        triggerHaptic("warning");
       },
-    ]);
+    });
   };
 
   const returnToMenu = () => {
@@ -98,26 +93,18 @@ export function GameScreen() {
       dispatch({ type: "toggleTimer" });
     }
 
-    Alert.alert(
-      "Retour au menu ?",
-      "Cette manche sera annulée. Aucun score ne sera modifié.",
-      [
-        {
-          text: "Continuer",
-          style: "cancel",
-          onPress: timerWasRunning ? () => dispatch({ type: "toggleTimer" }) : undefined,
-        },
-        {
-          text: "Retour au menu",
-          style: "destructive",
-          onPress: () => {
-            dispatch({ type: "returnToMenu" });
-            triggerHaptic("warning");
-          },
-        },
-      ],
-      { cancelable: false },
-    );
+    confirmAction({
+      title: "Retour au menu ?",
+      message: "Cette manche sera annulée. Aucun score ne sera modifié.",
+      confirmText: "Retour au menu",
+      cancelText: "Continuer",
+      onCancel: timerWasRunning ? () => dispatch({ type: "toggleTimer" }) : undefined,
+      onConfirm: () => {
+        dispatch({ type: "returnToMenu" });
+        triggerHaptic("warning");
+      },
+      cancelable: false,
+    });
   };
 
   return (

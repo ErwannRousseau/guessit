@@ -59,12 +59,14 @@ let GameScreen: typeof import("@/screens/game-screen").GameScreen;
 let LandingScreen: typeof import("@/screens/landing-screen").LandingScreen;
 let Platform: typeof import("react-native").Platform;
 let Pressable: typeof import("@/ui/pressable").Pressable;
+let confirmAction: typeof import("@/lib/confirmation").confirmAction;
 
 beforeAll(async () => {
   ({ GameScreen } = await import("@/screens/game-screen"));
   ({ LandingScreen } = await import("@/screens/landing-screen"));
   ({ Platform } = await import("react-native"));
   ({ Pressable } = await import("@/ui/pressable"));
+  ({ confirmAction } = await import("@/lib/confirmation"));
 });
 
 beforeEach(() => {
@@ -136,5 +138,52 @@ describe("Pressable", () => {
     expect(impactAsync).toHaveBeenNthCalledWith(2, "medium");
     expect(notificationAsync).toHaveBeenNthCalledWith(1, "success");
     expect(notificationAsync).toHaveBeenNthCalledWith(2, "warning");
+  });
+});
+
+describe("confirmAction", () => {
+  test("runs the confirmed web action", () => {
+    const confirm = mock(() => true);
+    const onConfirm = mock(() => {});
+    const onCancel = mock(() => {});
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "web" });
+    Object.defineProperty(globalThis, "confirm", { configurable: true, value: confirm });
+
+    confirmAction({
+      title: "Retirer Joueur 5 ?",
+      message: "Son score de 0 points sera perdu.",
+      confirmText: "Retirer",
+      cancelText: "Annuler",
+      onConfirm,
+      onCancel,
+    });
+
+    expect(confirm).toHaveBeenCalledWith("Retirer Joueur 5 ?\n\nSon score de 0 points sera perdu.");
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+    expect(onCancel).not.toHaveBeenCalled();
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" });
+  });
+
+  test("runs the cancelled web action", () => {
+    const onConfirm = mock(() => {});
+    const onCancel = mock(() => {});
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "web" });
+    Object.defineProperty(globalThis, "confirm", {
+      configurable: true,
+      value: mock(() => false),
+    });
+
+    confirmAction({
+      title: "Retour au menu ?",
+      message: "Cette manche sera annulée.",
+      confirmText: "Retour au menu",
+      cancelText: "Continuer",
+      onConfirm,
+      onCancel,
+    });
+
+    expect(onConfirm).not.toHaveBeenCalled();
+    expect(onCancel).toHaveBeenCalledTimes(1);
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" });
   });
 });
