@@ -7,7 +7,6 @@ export type GamePhase = "setup" | "roles" | "ready" | "questions" | "vote" | "re
 export type RoundEndReason = "word-found" | "time-up";
 
 export type RoundOutcome = {
-  kind: "insider-found" | "wrong-accusation" | "insider-failed";
   tone: "success" | "danger";
   kicker: string;
   title: string;

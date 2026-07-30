@@ -1,6 +1,6 @@
-import { createPlayers, createRound } from "./game-engine";
-import type { CategoryId, GameState, Round } from "./game.types";
-import { completeRound } from "./round-outcome";
+import { createPlayers, createRound } from "@/features/game/game-engine";
+import type { CategoryId, GameState, Round } from "@/features/game/game.types";
+import { completeRound } from "@/features/game/round-outcome";
 
 export const MIN_PLAYERS = 4;
 export const MAX_PLAYERS = 10;

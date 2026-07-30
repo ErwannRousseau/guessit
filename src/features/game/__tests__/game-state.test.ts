@@ -85,7 +85,6 @@ describe("gameReducer", () => {
       timerRunning: false,
       endReason: "time-up",
       outcome: {
-        kind: "insider-failed",
         title: "Le Complice perd 1 point !",
       },
     });

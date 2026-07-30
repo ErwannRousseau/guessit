@@ -38,9 +38,8 @@ describe("completeRound", () => {
       { ...players[3], score: 1 },
     ]);
     expect(completion?.round.outcome).toMatchObject({
-      kind: "insider-found",
       kicker: "ENQUÊTE RÉUSSIE",
-      title: "Les Enquêteurs gagnent !",
+      title: "Tous les autres joueurs gagnent !",
       description: "Le mot et le Complice ont tous les deux été trouvés.",
     });
   });
@@ -55,7 +54,6 @@ describe("completeRound", () => {
       players[3],
     ]);
     expect(completion?.round.outcome).toMatchObject({
-      kind: "wrong-accusation",
       kicker: "MISSION ACCOMPLIE",
       title: "Le Complice s’en sort !",
       description: "Chloé a été accusé à tort.",
@@ -75,7 +73,6 @@ describe("completeRound", () => {
       players[3],
     ]);
     expect(completion?.round.outcome).toMatchObject({
-      kind: "insider-failed",
       kicker: "TEMPS ÉCOULÉ",
       title: "Le Complice perd 1 point !",
       description: "Le groupe n’a pas trouvé le mot avant la fin du temps imparti.",

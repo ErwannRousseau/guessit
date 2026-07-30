@@ -1,4 +1,4 @@
-import type { Player, Round, RoundOutcome } from "./game.types";
+import type { Player, Round, RoundOutcome } from "@/features/game/game.types";
 
 export type RoundCompletion = {
   players: Player[];
@@ -10,7 +10,6 @@ export function completeRound(players: Player[], round: Round): RoundCompletion 
 
   if (round.endReason === "time-up") {
     const outcome: RoundOutcome = {
-      kind: "insider-failed",
       tone: "danger",
       kicker: "TEMPS ÉCOULÉ",
       title: "Le Complice perd 1 point !",
@@ -29,14 +28,12 @@ export function completeRound(players: Player[], round: Round): RoundCompletion 
   const insiderFound = round.suspectedIndex === round.insiderIndex;
   const outcome: RoundOutcome = insiderFound
     ? {
-        kind: "insider-found",
         tone: "success",
         kicker: "ENQUÊTE RÉUSSIE",
-        title: "Les Enquêteurs gagnent !",
+        title: "Tous les autres joueurs gagnent !",
         description: "Le mot et le Complice ont tous les deux été trouvés.",
       }
     : {
-        kind: "wrong-accusation",
         tone: "danger",
         kicker: "MISSION ACCOMPLIE",
         title: "Le Complice s’en sort !",

@@ -4,7 +4,7 @@ import { colors, spacing } from "@/constants/theme";
 import { Button } from "@/ui/button";
 import { Card } from "@/ui/card";
 
-import type { Player, Round, RoundOutcome } from "./game.types";
+import type { Player, Round, RoundOutcome } from "@/features/game/game.types";
 
 export function ResultPhase({
   players,
