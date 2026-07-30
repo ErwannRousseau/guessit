@@ -2,13 +2,13 @@ import type { Dispatch } from "react";
 
 import type { GameAction } from "@/features/game/game-state";
 import type { GameState } from "@/features/game/game.types";
-import { MenuPrincipalPhase } from "@/features/game/menu-principal-phase";
+import { MainMenuPhase } from "@/features/game/main-menu-phase";
 import { ResultPhase } from "@/features/game/result-phase";
 import { RoleRevealPhase } from "@/features/game/role-reveal-phase";
 import { QuestionsPhase, ReadyPhase } from "@/features/game/round-phases";
 import { VotePhase } from "@/features/game/vote-phase";
 
-type PartieFlowPhaseProps = {
+type GameFlowPhaseProps = {
   game: GameState;
   dispatch: Dispatch<GameAction>;
   onRemovePlayer: (index: number) => void;
@@ -16,17 +16,17 @@ type PartieFlowPhaseProps = {
   onReturnToMenu: () => void;
 };
 
-export function PartieFlowPhase({
+export function GameFlowPhase({
   game,
   dispatch,
   onRemovePlayer,
   onReset,
   onReturnToMenu,
-}: PartieFlowPhaseProps) {
+}: GameFlowPhaseProps) {
   switch (game.phase) {
     case "setup":
       return (
-        <MenuPrincipalPhase
+        <MainMenuPhase
           game={game}
           dispatch={dispatch}
           onRemovePlayer={onRemovePlayer}

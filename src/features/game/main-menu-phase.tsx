@@ -22,19 +22,14 @@ import { Pressable } from "@/ui/pressable";
 const categories: CategoryId[] = ["mix", "objects", "animals", "food", "places", "jobs", "leisure"];
 const durations = [180, 300, 420] as const;
 
-type MenuPrincipalPhaseProps = {
+type MainMenuPhaseProps = {
   game: GameState;
   dispatch: Dispatch<GameAction>;
   onRemovePlayer: (index: number) => void;
   onReset: () => void;
 };
 
-export function MenuPrincipalPhase({
-  game,
-  dispatch,
-  onRemovePlayer,
-  onReset,
-}: MenuPrincipalPhaseProps) {
+export function MainMenuPhase({ game, dispatch, onRemovePlayer, onReset }: MainMenuPhaseProps) {
   const playerRemovalDisabled = game.playerCount <= MIN_PLAYERS;
 
   return (

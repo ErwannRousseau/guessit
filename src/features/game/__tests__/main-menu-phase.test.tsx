@@ -13,11 +13,11 @@ mock.module("../../../../assets/images/logo-mark.png", () => ({
 }));
 
 let initialGameState: typeof import("@/features/game/game-state").initialGameState;
-let MenuPrincipalPhase: typeof import("@/features/game/menu-principal-phase").MenuPrincipalPhase;
+let MainMenuPhase: typeof import("@/features/game/main-menu-phase").MainMenuPhase;
 
 beforeAll(async () => {
   ({ initialGameState } = await import("@/features/game/game-state"));
-  ({ MenuPrincipalPhase } = await import("@/features/game/menu-principal-phase"));
+  ({ MainMenuPhase } = await import("@/features/game/main-menu-phase"));
 });
 
 type MenuElementProps = {
@@ -43,13 +43,13 @@ function menuControl(elements: ReactElement<MenuElementProps>[], name: string) {
   return control;
 }
 
-describe("MenuPrincipalPhase", () => {
+describe("MainMenuPhase", () => {
   test("wires interactions through its external interface", () => {
     const dispatch = mock((_action: GameAction) => {});
     const onRemovePlayer = mock((_index: number) => {});
     const onReset = mock(() => {});
     const elements = menuElements(
-      MenuPrincipalPhase({
+      MainMenuPhase({
         game: initialGameState(),
         dispatch,
         onRemovePlayer,
