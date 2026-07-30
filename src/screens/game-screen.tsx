@@ -192,10 +192,11 @@ export function GameScreen() {
             />
           ) : null}
 
-          {game.phase === "result" && game.round ? (
+          {game.phase === "result" && game.round?.outcome ? (
             <ResultPhase
               players={game.players}
               round={game.round}
+              outcome={game.round.outcome}
               onNextRound={() => dispatch({ type: "startRound" })}
               onReturnToMenu={returnToMenu}
             />

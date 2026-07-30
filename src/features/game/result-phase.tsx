@@ -4,46 +4,34 @@ import { colors, spacing } from "@/constants/theme";
 import { Button } from "@/ui/button";
 import { Card } from "@/ui/card";
 
-import type { Player, Round } from "./game.types";
+import type { Player, Round, RoundOutcome } from "@/features/game/game.types";
 
 export function ResultPhase({
   players,
   round,
+  outcome,
   onNextRound,
   onReturnToMenu,
 }: {
   players: Player[];
   round: Round;
+  outcome: RoundOutcome;
   onNextRound: () => void;
   onReturnToMenu: () => void;
 }) {
-  const detectivesWon =
-    round.endReason === "word-found" && round.suspectedIndex === round.insiderIndex;
-  const timeExpired = round.endReason === "time-up";
-  const winnerTitle = detectivesWon
-    ? "Les Enquêteurs gagnent !"
-    : timeExpired
-      ? "Le Complice perd 1 point !"
-      : "Le Complice s’en sort !";
-  const winnerDescription = detectivesWon
-    ? "Le mot et le Complice ont tous les deux été trouvés."
-    : timeExpired
-      ? "Le groupe n’a pas trouvé le mot avant la fin du temps imparti."
-      : `${players[round.suspectedIndex ?? 0].name} a été accusé à tort.`;
-
   const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContent}>
-      <Card tone={detectivesWon ? "success" : "danger"} style={styles.resultHero}>
+      <Card tone={outcome.tone} style={styles.resultHero}>
         <Text selectable style={styles.resultKicker}>
-          {detectivesWon ? "ENQUÊTE RÉUSSIE" : timeExpired ? "TEMPS ÉCOULÉ" : "MISSION ACCOMPLIE"}
+          {outcome.kicker}
         </Text>
         <Text selectable style={styles.resultTitle}>
-          {winnerTitle}
+          {outcome.title}
         </Text>
         <Text selectable style={styles.resultDescription}>
-          {winnerDescription}
+          {outcome.description}
         </Text>
       </Card>
       <Card>

@@ -1,12 +1,6 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
 
-import {
-  applyRoundScore,
-  createPlayers,
-  createRound,
-  formatTime,
-  getRole,
-} from "@/features/game/game-engine";
+import { createPlayers, createRound, formatTime, getRole } from "@/features/game/game-engine";
 import type { Player, Round } from "@/features/game/game.types";
 
 const originalRandom = Math.random;
@@ -30,7 +24,7 @@ function round(overrides: Partial<Round> = {}): Round {
     timerRunning: false,
     endReason: null,
     suspectedIndex: null,
-    scoreApplied: false,
+    outcome: null,
     ...overrides,
   };
 }
@@ -82,7 +76,7 @@ describe("createRound", () => {
       timerRunning: false,
       endReason: null,
       suspectedIndex: null,
-      scoreApplied: false,
+      outcome: null,
     });
   });
 
@@ -112,33 +106,5 @@ describe("role and display helpers", () => {
     expect(formatTime(0)).toBe("0:00");
     expect(formatTime(65)).toBe("1:05");
     expect(formatTime(600)).toBe("10:00");
-  });
-});
-
-describe("applyRoundScore", () => {
-  test("awards one point to every detective when the insider is found", () => {
-    expect(applyRoundScore(players, round({ endReason: "word-found", suspectedIndex: 1 }))).toEqual(
-      [
-        { ...players[0], score: 1 },
-        players[1],
-        { ...players[2], score: 2 },
-        { ...players[3], score: 1 },
-      ],
-    );
-  });
-
-  test("awards the insider two points for a wrong accusation", () => {
-    expect(applyRoundScore(players, round({ endReason: "word-found", suspectedIndex: 2 }))).toEqual(
-      [players[0], { ...players[1], score: 4 }, players[2], players[3]],
-    );
-  });
-
-  test("deducts one point from the insider when time expires", () => {
-    expect(applyRoundScore(players, round({ endReason: "time-up" }))).toEqual([
-      players[0],
-      { ...players[1], score: 1 },
-      players[2],
-      players[3],
-    ]);
   });
 });
