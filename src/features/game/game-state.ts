@@ -1,5 +1,6 @@
-import { applyRoundScore, createPlayers, createRound } from "./game-engine";
+import { createPlayers, createRound } from "./game-engine";
 import type { CategoryId, GameState, Round } from "./game.types";
+import { completeRound } from "./round-outcome";
 
 export const MIN_PLAYERS = 4;
 export const MAX_PLAYERS = 10;
@@ -35,13 +36,14 @@ type GameAction =
   | { type: "returnToMenu" }
   | { type: "reset" };
 
-function completeRound(game: GameState, round: Round): GameState {
-  if (game.round?.scoreApplied) return game;
+function finishRound(game: GameState, round: Round): GameState {
+  const completion = completeRound(game.players, round);
+  if (!completion) return game;
   return {
     ...game,
     phase: "result",
-    round,
-    players: applyRoundScore(game.players, round),
+    round: completion.round,
+    players: completion.players,
   };
 }
 
@@ -134,9 +136,8 @@ export function gameReducer(game: GameState, action: GameAction): GameState {
         remainingSeconds: 0,
         timerRunning: false,
         endReason: "time-up",
-        scoreApplied: true,
       };
-      return completeRound(game, round);
+      return finishRound(game, round);
     }
     case "wordFound":
       return game.round
@@ -148,11 +149,10 @@ export function gameReducer(game: GameState, action: GameAction): GameState {
         : game;
     case "giveUp":
       return game.round
-        ? completeRound(game, {
+        ? finishRound(game, {
             ...game.round,
             timerRunning: false,
             endReason: "time-up",
-            scoreApplied: true,
           })
         : game;
     case "selectSuspect":
@@ -161,7 +161,7 @@ export function gameReducer(game: GameState, action: GameAction): GameState {
         : game;
     case "revealResult": {
       if (!game.round || game.round.suspectedIndex === null) return game;
-      return completeRound(game, { ...game.round, scoreApplied: true });
+      return finishRound(game, game.round);
     }
     case "returnToMenu":
       if (game.phase === "setup") return game;

@@ -30,7 +30,7 @@ function activeGame(roundOverrides: Partial<Round> = {}): GameState {
       timerRunning: true,
       endReason: null,
       suspectedIndex: null,
-      scoreApplied: false,
+      outcome: null,
       ...roundOverrides,
     },
   };
@@ -84,7 +84,10 @@ describe("gameReducer", () => {
       remainingSeconds: 0,
       timerRunning: false,
       endReason: "time-up",
-      scoreApplied: true,
+      outcome: {
+        kind: "insider-failed",
+        title: "Le Complice perd 1 point !",
+      },
     });
     expect(result.players.map(({ score }) => score)).toEqual([0, -1, 0, 0]);
   });

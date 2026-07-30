@@ -6,6 +6,14 @@ export type GamePhase = "setup" | "roles" | "ready" | "questions" | "vote" | "re
 
 export type RoundEndReason = "word-found" | "time-up";
 
+export type RoundOutcome = {
+  kind: "insider-found" | "wrong-accusation" | "insider-failed";
+  tone: "success" | "danger";
+  kicker: string;
+  title: string;
+  description: string;
+};
+
 export type Player = {
   id: string;
   name: string;
@@ -23,7 +31,7 @@ export type Round = {
   timerRunning: boolean;
   endReason: RoundEndReason | null;
   suspectedIndex: number | null;
-  scoreApplied: boolean;
+  outcome: RoundOutcome | null;
 };
 
 export type GameState = {
