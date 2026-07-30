@@ -40,6 +40,8 @@ docs/
   `src/features/<feature>`, shared visuals in `src/ui`, and cross-cutting values in `src/constants`.
 - Internal game views use `*Phase`; use `*Screen` only for components rendered by Expo Router.
 - Application imports use `@/`; do not add barrel `index.ts` files.
+- Use English for source identifiers and filenames; keep French domain terms in UI copy and
+  product documentation.
 - Tests live beside their domain in `__tests__` and import application modules through `@/`.
 - Use named exports, immutable reducer updates, `StyleSheet.create`, double quotes, trailing commas.
 - Oxfmt and Oxlint own formatting and linting; read their current config before changing rules.

@@ -76,7 +76,7 @@ beforeEach(() => {
 });
 
 describe("GameScreen", () => {
-  test("renders an accessible four-player setup", () => {
+  test("renders an accessible four-player Menu principal", () => {
     const markup = renderToStaticMarkup(<GameScreen />);
 
     expect(markup.match(/<input\b/g)).toHaveLength(4);
