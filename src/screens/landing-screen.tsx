@@ -1,10 +1,9 @@
 import { Link } from "expo-router";
 import Head from "expo-router/head";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors, radii, spacing } from "@/constants/theme";
-import { useScreenSize } from "@/hooks/use-screen-size";
 import { Button } from "@/ui/button";
 import { Pressable } from "@/ui/pressable";
 
@@ -81,7 +80,8 @@ const faqs = [
 ];
 
 export function LandingScreen() {
-  const { isSmall } = useScreenSize();
+  const { width } = useWindowDimensions();
+  const isSmall = width < 760;
 
   return (
     <>
