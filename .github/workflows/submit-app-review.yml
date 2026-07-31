@@ -73,19 +73,6 @@ jobs:
           printf 'Selected App Store Connect build: `%s`\n' "$BUILD_ID" \
             >>"$GITHUB_STEP_SUMMARY"
 
-      - name: Preview App Store staging
-        env:
-          BUILD_ID: ${{ steps.build.outputs.id }}
-        run: |
-          asc release stage \
-            --app "$ASC_APP_ID" \
-            --version "$RELEASE_VERSION" \
-            --build "$BUILD_ID" \
-            --metadata-dir "store-metadata/apple" \
-            --strict-validate \
-            --dry-run \
-            --output table
-
       - name: Stage App Store version
         env:
           BUILD_ID: ${{ steps.build.outputs.id }}
