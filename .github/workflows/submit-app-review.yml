@@ -52,6 +52,9 @@ jobs:
         with:
           version: "3.1.1"
 
+      - name: Validate App Store metadata
+        run: asc metadata validate --dir "store-metadata/apple" --output table
+
       - name: Resolve latest valid build
         id: build
         run: |
@@ -78,7 +81,7 @@ jobs:
             --app "$ASC_APP_ID" \
             --version "$RELEASE_VERSION" \
             --build "$BUILD_ID" \
-            --metadata-dir "store-metadata/apple/version/$RELEASE_VERSION" \
+            --metadata-dir "store-metadata/apple" \
             --strict-validate \
             --dry-run \
             --output table
@@ -91,7 +94,7 @@ jobs:
             --app "$ASC_APP_ID" \
             --version "$RELEASE_VERSION" \
             --build "$BUILD_ID" \
-            --metadata-dir "store-metadata/apple/version/$RELEASE_VERSION" \
+            --metadata-dir "store-metadata/apple" \
             --strict-validate \
             --confirm \
             --output table
