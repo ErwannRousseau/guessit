@@ -4,6 +4,6 @@ export function useScreenSize() {
   const { width } = useWindowDimensions();
 
   return {
-    isSmall: width < 760,
+    isSmall: width > 0 && width < 760,
   };
 }
