@@ -9,6 +9,7 @@ import { Button } from "@/ui/button";
 import { Pressable } from "@/ui/pressable";
 
 const appIcon = require("../../assets/images/icon.png");
+const appStoreUrl = "https://apps.apple.com/fr/app/guessit-le-complice/id6794387024?l=en-GB";
 const heroScreenshot = require("../../store-assets/apple/iphone/1320x2868/fr-FR/04-device-top.png");
 const gameplayScreenshots = [
   {
@@ -72,7 +73,8 @@ const faqs = [
   },
   {
     question: "Peut-on jouer sans installer l’application ?",
-    answer: "Oui. La version web reste disponible pendant que les apps iOS et Android arrivent.",
+    answer:
+      "Oui. La version web reste disponible, et l’application iOS est maintenant disponible sur l’App Store.",
   },
   {
     question: "Combien de temps dure une manche ?",
@@ -226,7 +228,7 @@ export function LandingScreen() {
                   Qui sera le meilleur Complice ?
                 </Text>
                 <Text style={styles.finalSubtitle}>
-                  Retrouvez bientôt GuessIt sur iOS et Android, ou lancez la version web maintenant.
+                  Téléchargez GuessIt sur iOS ou lancez la version web maintenant.
                 </Text>
               </View>
               <View style={styles.finalAction}>
@@ -268,13 +270,17 @@ function SectionHeader({
 
 function StoreDownloadCard({ platform }: { platform: "iOS" | "Android" }) {
   const storeName = platform === "iOS" ? "l’App Store" : "Google Play";
-
-  return (
+  const isAvailable = platform === "iOS";
+  const card = (
     <Pressable
-      accessibilityLabel={`Téléchargement ${platform}, bientôt disponible`}
+      accessibilityLabel={
+        isAvailable
+          ? `Télécharger GuessIt sur ${storeName}`
+          : `Téléchargement ${platform}, bientôt disponible`
+      }
       accessibilityRole="button"
-      accessibilityState={{ disabled: true }}
-      disabled
+      accessibilityState={{ disabled: !isAvailable }}
+      disabled={!isAvailable}
       style={styles.storeCard}
     >
       <Image source={appIcon} style={styles.storeIcon} />
@@ -283,9 +289,19 @@ function StoreDownloadCard({ platform }: { platform: "iOS" | "Android" }) {
           <Text style={styles.storeTagText}>{platform}</Text>
         </View>
         <Text style={styles.storeTitle}>Télécharger sur {storeName}</Text>
-        <Text style={styles.storeStatus}>Bientôt disponible</Text>
+        <Text style={styles.storeStatus}>
+          {isAvailable ? "Disponible maintenant" : "Bientôt disponible"}
+        </Text>
       </View>
     </Pressable>
+  );
+
+  return isAvailable ? (
+    <Link href={appStoreUrl} asChild>
+      {card}
+    </Link>
+  ) : (
+    card
   );
 }
 

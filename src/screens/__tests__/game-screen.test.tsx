@@ -92,9 +92,13 @@ describe("LandingScreen", () => {
   test("prioritizes mobile downloads before web play", () => {
     const markup = renderToStaticMarkup(<LandingScreen />);
 
-    expect(markup.match(/aria-disabled="true"/g)).toHaveLength(4);
+    expect(markup.match(/aria-disabled="true"/g)).toHaveLength(2);
     expect(markup).toContain("Télécharger sur l’App Store");
     expect(markup).toContain("Télécharger sur Google Play");
+    expect(markup).toContain(
+      'href="https://apps.apple.com/fr/app/guessit-le-complice/id6794387024?l=en-GB"',
+    );
+    expect(markup).toContain("Disponible maintenant");
     expect(markup).toContain("Bientôt disponible");
     expect(markup).toContain(">iOS<");
     expect(markup).toContain(">Android<");
