@@ -271,6 +271,10 @@ function SectionHeader({
 function StoreDownloadCard({ platform }: { platform: "iOS" | "Android" }) {
   const isAvailable = platform === "iOS";
   const storeName = platform === "iOS" ? "l’App Store" : "Google Play";
+  const cardStyle = StyleSheet.flatten([
+    styles.storeCard,
+    isAvailable ? styles.storeCardAvailable : styles.storeCardUnavailable,
+  ]);
   const card = (
     <Pressable
       accessibilityLabel={
@@ -281,10 +285,7 @@ function StoreDownloadCard({ platform }: { platform: "iOS" | "Android" }) {
       accessibilityRole="button"
       accessibilityState={{ disabled: !isAvailable }}
       disabled={!isAvailable}
-      style={[
-        styles.storeCard,
-        isAvailable ? styles.storeCardAvailable : styles.storeCardUnavailable,
-      ]}
+      style={cardStyle}
     >
       <Image source={appIcon} style={styles.storeIcon} />
       <View style={styles.storeCopy}>
@@ -292,9 +293,13 @@ function StoreDownloadCard({ platform }: { platform: "iOS" | "Android" }) {
           <Text style={styles.storeTagText}>{platform}</Text>
         </View>
         <Text style={styles.storeTitle}>Télécharger sur {storeName}</Text>
-        <Text style={[styles.storeStatus, isAvailable && styles.storeStatusAvailable]}>
-          {isAvailable ? "Disponible maintenant" : "Bientôt disponible"}
-        </Text>
+        {isAvailable ? (
+          <View style={styles.storeStatusBadge}>
+            <Text style={styles.storeStatusAvailable}>Disponible maintenant</Text>
+          </View>
+        ) : (
+          <Text style={styles.storeStatus}>Bientôt disponible</Text>
+        )}
       </View>
     </Pressable>
   );
@@ -655,6 +660,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   storeCard: {
+    display: "flex",
     flex: 1,
     minHeight: 92,
     flexDirection: "row",
@@ -665,9 +671,10 @@ const styles = StyleSheet.create({
     borderColor: colors.dark,
     borderRadius: radii.medium,
     backgroundColor: colors.surface,
+    textDecorationLine: "none",
   },
   storeCardAvailable: {
-    borderColor: colors.success,
+    borderColor: colors.violet,
   },
   storeCardUnavailable: {
     borderColor: colors.line,
@@ -711,8 +718,18 @@ const styles = StyleSheet.create({
     lineHeight: 15,
     fontWeight: "700",
   },
+  storeStatusBadge: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+    borderWidth: 1.5,
+    borderColor: colors.accent,
+    borderRadius: radii.pill,
+    backgroundColor: colors.accentSoft,
+  },
   storeStatusAvailable: {
-    color: colors.success,
+    color: colors.ink,
+    fontSize: 11,
+    lineHeight: 15,
     fontWeight: "900",
   },
 });
