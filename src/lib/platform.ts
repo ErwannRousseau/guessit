@@ -1,7 +1,7 @@
 import { Platform } from "react-native";
 
-export function isIOS(platform: string = Platform.OS) {
-  return platform.toLowerCase() === "ios";
+export function isIOS() {
+  return Platform.OS === "ios";
 }
 
 export function isWeb() {

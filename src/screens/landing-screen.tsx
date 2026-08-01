@@ -269,8 +269,8 @@ function SectionHeader({
 }
 
 function StoreDownloadCard({ platform }: { platform: "iOS" | "Android" }) {
-  const storeName = platform === "iOS" ? "l’App Store" : "Google Play";
   const isAvailable = platform === "iOS";
+  const storeName = platform === "iOS" ? "l’App Store" : "Google Play";
   const card = (
     <Pressable
       accessibilityLabel={
@@ -281,7 +281,10 @@ function StoreDownloadCard({ platform }: { platform: "iOS" | "Android" }) {
       accessibilityRole="button"
       accessibilityState={{ disabled: !isAvailable }}
       disabled={!isAvailable}
-      style={styles.storeCard}
+      style={[
+        styles.storeCard,
+        isAvailable ? styles.storeCardAvailable : styles.storeCardUnavailable,
+      ]}
     >
       <Image source={appIcon} style={styles.storeIcon} />
       <View style={styles.storeCopy}>
@@ -289,7 +292,7 @@ function StoreDownloadCard({ platform }: { platform: "iOS" | "Android" }) {
           <Text style={styles.storeTagText}>{platform}</Text>
         </View>
         <Text style={styles.storeTitle}>Télécharger sur {storeName}</Text>
-        <Text style={styles.storeStatus}>
+        <Text style={[styles.storeStatus, isAvailable && styles.storeStatusAvailable]}>
           {isAvailable ? "Disponible maintenant" : "Bientôt disponible"}
         </Text>
       </View>
@@ -663,6 +666,14 @@ const styles = StyleSheet.create({
     borderRadius: radii.medium,
     backgroundColor: colors.surface,
   },
+  storeCardAvailable: {
+    borderColor: colors.success,
+  },
+  storeCardUnavailable: {
+    borderColor: colors.line,
+    backgroundColor: colors.surfaceStrong,
+    opacity: 0.55,
+  },
   storeIcon: {
     width: 46,
     height: 46,
@@ -699,5 +710,9 @@ const styles = StyleSheet.create({
     fontSize: 11,
     lineHeight: 15,
     fontWeight: "700",
+  },
+  storeStatusAvailable: {
+    color: colors.success,
+    fontWeight: "900",
   },
 });
