@@ -13,6 +13,10 @@ const config: ExpoConfig = {
     supportsTablet: false,
     bundleIdentifier: "com.erwannrousseau.guessit",
     icon: "./assets/app-icon.icon",
+    infoPlist: {
+      CFBundleDevelopmentRegion: "fr",
+      CFBundleLocalizations: ["fr"],
+    },
     config: {
       usesNonExemptEncryption: false,
     },
