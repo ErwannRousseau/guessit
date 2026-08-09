@@ -1,10 +1,10 @@
+import { Image } from "expo-image";
 import { Link } from "expo-router";
 import Head from "expo-router/head";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors, radii, spacing } from "@/constants/theme";
-import { useScreenSize } from "@/hooks/use-screen-size";
 import { Button } from "@/ui/button";
 import { Pressable } from "@/ui/pressable";
 
@@ -27,6 +27,24 @@ const gameplayScreenshots = [
 ];
 
 const gameFacts = ["👥 4–10 joueurs", "⏱ 3–7 min", "📱 Un seul téléphone", "🌐 Dans le navigateur"];
+
+const wideLayoutStyles = `
+  @media (min-width: 760px) {
+    #landing-hero { min-height: 620px; flex-direction: row; align-items: center; gap: 56px; }
+    #landing-hero-copy { flex: 1.08; }
+    #landing-title { font-size: 62px; line-height: 62px; letter-spacing: -2.8px; }
+    #landing-subtitle { font-size: 20px; line-height: 30px; }
+    #landing-store-list { flex-direction: row; }
+    #landing-hero-action { max-width: 330px; }
+    #landing-hero-visual { flex: 0.85; height: 610px; }
+    #landing-steps, #landing-gameplay, #landing-reasons { flex-direction: row; }
+    #landing-step-1, #landing-step-2, #landing-step-3, #landing-step-4,
+    #landing-gameplay-1, #landing-gameplay-2, #landing-gameplay-3,
+    #landing-reason-1, #landing-reason-2, #landing-reason-3 { flex: 1; }
+    #landing-faq { flex-direction: row; align-items: flex-start; }
+    #landing-final { flex-direction: row; align-items: center; justify-content: space-between; padding: ${spacing.xxl}px; }
+  }
+`;
 
 const steps = [
   {
@@ -83,8 +101,6 @@ const faqs = [
 ];
 
 export function LandingScreen() {
-  const { isSmall } = useScreenSize();
-
   return (
     <>
       <Head>
@@ -93,6 +109,7 @@ export function LandingScreen() {
           name="description"
           content="Découvrez GuessIt, le jeu de bluff et de déduction pour vos soirées, sur iOS, Android et web."
         />
+        <style>{wideLayoutStyles}</style>
       </Head>
 
       <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
@@ -106,16 +123,13 @@ export function LandingScreen() {
               <Text style={styles.brandName}>GuessIt</Text>
             </View>
 
-            <View style={[styles.hero, !isSmall && styles.heroWide]}>
-              <View style={[styles.heroCopy, !isSmall && styles.heroCopyWide]}>
+            <View nativeID="landing-hero" style={styles.hero}>
+              <View nativeID="landing-hero-copy" style={styles.heroCopy}>
                 <Text style={styles.eyebrow}>BLUFF, DÉDUCTION & FOUS RIRES</Text>
-                <Text
-                  accessibilityRole="header"
-                  style={[styles.title, !isSmall && styles.titleWide]}
-                >
+                <Text accessibilityRole="header" nativeID="landing-title" style={styles.title}>
                   Le Complice se cache autour de la table.
                 </Text>
-                <Text selectable style={[styles.subtitle, !isSmall && styles.copyWide]}>
+                <Text nativeID="landing-subtitle" selectable style={styles.subtitle}>
                   Un téléphone passe de main en main. Tout le monde cherche le mot secret. Une seule
                   personne brouille les pistes.
                 </Text>
@@ -125,13 +139,13 @@ export function LandingScreen() {
 
                 <View style={styles.downloads}>
                   <Text style={styles.downloadsLabel}>TÉLÉCHARGER L’APPLICATION</Text>
-                  <View style={[styles.storeList, !isSmall && styles.storeListWide]}>
+                  <View nativeID="landing-store-list" style={styles.storeList}>
                     <StoreDownloadCard platform="iOS" />
                     <StoreDownloadCard platform="Android" />
                   </View>
                 </View>
 
-                <View style={[styles.heroAction, !isSmall && styles.heroActionWide]}>
+                <View nativeID="landing-hero-action" style={styles.heroAction}>
                   <Link href="/play" asChild>
                     <Button variant="secondary">Jouer sur le web</Button>
                   </Link>
@@ -147,7 +161,7 @@ export function LandingScreen() {
                 </View>
               </View>
 
-              <View style={[styles.heroVisual, !isSmall && styles.heroVisualWide]}>
+              <View nativeID="landing-hero-visual" style={styles.heroVisual}>
                 <View style={styles.heroAccent} />
                 <Image
                   accessibilityLabel="Écran de jeu montrant le chrono d’une manche"
@@ -162,9 +176,13 @@ export function LandingScreen() {
               eyebrow="COMMENT ÇA MARCHE"
               title="Une partie comprise en moins de 15 secondes."
             />
-            <View style={[styles.grid, !isSmall && styles.fourColumns]}>
-              {steps.map((step) => (
-                <View key={step.number} style={[styles.stepCard, !isSmall && styles.gridCard]}>
+            <View nativeID="landing-steps" style={styles.grid}>
+              {steps.map((step, index) => (
+                <View
+                  key={step.number}
+                  nativeID={`landing-step-${index + 1}`}
+                  style={styles.stepCard}
+                >
                   <View style={styles.stepNumber}>
                     <Text style={styles.stepNumberText}>{step.number}</Text>
                   </View>
@@ -179,11 +197,12 @@ export function LandingScreen() {
               title="Voyez la partie avant de jouer."
               copy="Des rôles secrets au vote final, tout se joue sur une interface simple à faire circuler."
             />
-            <View style={[styles.grid, !isSmall && styles.threeColumns]}>
-              {gameplayScreenshots.map((screenshot) => (
+            <View nativeID="landing-gameplay" style={styles.grid}>
+              {gameplayScreenshots.map((screenshot, index) => (
                 <View
                   key={screenshot.label}
-                  style={[styles.screenshotCard, !isSmall && styles.gridCard]}
+                  nativeID={`landing-gameplay-${index + 1}`}
+                  style={styles.screenshotCard}
                 >
                   <Image
                     accessibilityLabel={screenshot.label}
@@ -200,16 +219,20 @@ export function LandingScreen() {
               eyebrow="POURQUOI ÇA MARCHE"
               title="Quelques règles. Beaucoup de soupçons."
             />
-            <View style={[styles.grid, !isSmall && styles.threeColumns]}>
-              {funReasons.map((reason) => (
-                <View key={reason.title} style={[styles.funCard, !isSmall && styles.gridCard]}>
+            <View nativeID="landing-reasons" style={styles.grid}>
+              {funReasons.map((reason, index) => (
+                <View
+                  key={reason.title}
+                  nativeID={`landing-reason-${index + 1}`}
+                  style={styles.funCard}
+                >
                   <Text style={styles.cardTitle}>{reason.title}</Text>
                   <Text style={styles.cardCopy}>{reason.copy}</Text>
                 </View>
               ))}
             </View>
 
-            <View style={[styles.faqSection, !isSmall && styles.faqWide]}>
+            <View nativeID="landing-faq" style={styles.faqSection}>
               <SectionHeader eyebrow="FAQ" title="Avant de passer le téléphone." />
               <View style={styles.faqList}>
                 {faqs.map((faq) => (
@@ -221,7 +244,7 @@ export function LandingScreen() {
               </View>
             </View>
 
-            <View style={[styles.finalCard, !isSmall && styles.finalCardWide]}>
+            <View nativeID="landing-final" style={styles.finalCard}>
               <View style={styles.finalCopy}>
                 <Text style={styles.finalEyebrow}>PRÊTS À BLUFFER ?</Text>
                 <Text accessibilityRole="header" aria-level={2} style={styles.finalTitle}>
@@ -348,17 +371,8 @@ const styles = StyleSheet.create({
   hero: {
     gap: spacing.xl,
   },
-  heroWide: {
-    minHeight: 620,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 56,
-  },
   heroCopy: {
     gap: spacing.md,
-  },
-  heroCopyWide: {
-    flex: 1.08,
   },
   eyebrow: {
     color: colors.primary,
@@ -375,21 +389,12 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     letterSpacing: -1.8,
   },
-  titleWide: {
-    fontSize: 62,
-    lineHeight: 62,
-    letterSpacing: -2.8,
-  },
   subtitle: {
     maxWidth: 620,
     color: colors.muted,
     fontSize: 18,
     lineHeight: 27,
     fontWeight: "600",
-  },
-  copyWide: {
-    fontSize: 20,
-    lineHeight: 30,
   },
   socialProof: {
     color: colors.ink,
@@ -415,9 +420,6 @@ const styles = StyleSheet.create({
     maxWidth: 420,
     gap: spacing.sm,
     marginTop: spacing.xs,
-  },
-  heroActionWide: {
-    maxWidth: 330,
   },
   actionNote: {
     color: colors.muted,
@@ -458,10 +460,6 @@ const styles = StyleSheet.create({
     borderRadius: radii.large,
     backgroundColor: colors.violet,
     transform: [{ rotate: "1.5deg" }],
-  },
-  heroVisualWide: {
-    flex: 0.85,
-    height: 610,
   },
   heroAccent: {
     position: "absolute",
@@ -506,15 +504,6 @@ const styles = StyleSheet.create({
   grid: {
     gap: spacing.md,
     marginTop: -48,
-  },
-  fourColumns: {
-    flexDirection: "row",
-  },
-  threeColumns: {
-    flexDirection: "row",
-  },
-  gridCard: {
-    flex: 1,
   },
   stepCard: {
     minHeight: 210,
@@ -587,10 +576,6 @@ const styles = StyleSheet.create({
   faqSection: {
     gap: spacing.xl,
   },
-  faqWide: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-  },
   faqList: {
     flex: 1,
     gap: spacing.sm,
@@ -616,12 +601,6 @@ const styles = StyleSheet.create({
     borderColor: colors.dark,
     borderRadius: radii.large,
     backgroundColor: colors.dark,
-  },
-  finalCardWide: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: spacing.xxl,
   },
   finalCopy: {
     flex: 1,
@@ -655,9 +634,6 @@ const styles = StyleSheet.create({
   },
   storeList: {
     gap: spacing.sm,
-  },
-  storeListWide: {
-    flexDirection: "row",
   },
   storeCard: {
     display: "flex",

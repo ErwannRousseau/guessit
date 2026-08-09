@@ -32,5 +32,6 @@ export default defineConfig({
     "react-perf/jsx-no-new-function-as-prop": "off",
     "react-perf/jsx-no-new-object-as-prop": "off",
     "unicorn/no-array-sort": ["warn", { allowAfterSpread: true }],
+    "import/no-unassigned-import": ["error", { allow: ["**/*.css"] }],
   },
 });

@@ -56,14 +56,14 @@ mock.module("expo-store-review", () => ({
 }));
 
 let GameScreen: typeof import("@/screens/game-screen").GameScreen;
-let LandingScreen: typeof import("@/screens/landing-screen").LandingScreen;
+let WebLandingScreen: typeof import("@/screens/landing-screen.web").LandingScreen;
 let Platform: typeof import("react-native").Platform;
 let Pressable: typeof import("@/ui/pressable").Pressable;
 let confirmAction: typeof import("@/lib/confirmation").confirmAction;
 
 beforeAll(async () => {
   ({ GameScreen } = await import("@/screens/game-screen"));
-  ({ LandingScreen } = await import("@/screens/landing-screen"));
+  ({ LandingScreen: WebLandingScreen } = await import("@/screens/landing-screen.web"));
   ({ Platform } = await import("react-native"));
   ({ Pressable } = await import("@/ui/pressable"));
   ({ confirmAction } = await import("@/lib/confirmation"));
@@ -90,7 +90,7 @@ describe("GameScreen", () => {
 
 describe("LandingScreen", () => {
   test("prioritizes mobile downloads before web play", () => {
-    const markup = renderToStaticMarkup(<LandingScreen />);
+    const markup = renderToStaticMarkup(<WebLandingScreen />);
 
     expect(markup.match(/aria-disabled="true"/g)).toHaveLength(2);
     expect(markup).toContain("Télécharger sur l’App Store");
@@ -104,6 +104,15 @@ describe("LandingScreen", () => {
     expect(markup).toContain(">Android<");
     expect(markup).toContain('href="/play"');
     expect(markup).toContain("Jouer sur le web");
+  });
+
+  test("ships responsive styles in static markup", () => {
+    const markup = renderToStaticMarkup(<WebLandingScreen />);
+
+    expect(markup).toContain('class="landing"');
+    expect(markup).toContain('class="landing__hero"');
+    expect(markup).toContain('class="landing__grid landing__grid--four"');
+    expect(markup).toContain('class="landing__final"');
   });
 });
 
