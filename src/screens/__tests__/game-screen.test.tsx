@@ -105,6 +105,15 @@ describe("LandingScreen", () => {
     expect(markup).toContain('href="/play"');
     expect(markup).toContain("Jouer sur le web");
   });
+
+  test("ships responsive styles in static markup", () => {
+    const markup = renderToStaticMarkup(<LandingScreen />);
+
+    expect(markup).toContain('class="landing"');
+    expect(markup).toContain('class="landing__hero"');
+    expect(markup).toContain('class="landing__grid landing__grid--four"');
+    expect(markup).toContain('class="landing__final"');
+  });
 });
 
 describe("Pressable", () => {
