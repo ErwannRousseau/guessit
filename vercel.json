@@ -2,6 +2,7 @@
   "buildCommand": "bun run export:web",
   "outputDirectory": "dist",
   "rewrites": [
+    { "source": "/play", "destination": "/play.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/support", "destination": "/support.html" }
   ]
