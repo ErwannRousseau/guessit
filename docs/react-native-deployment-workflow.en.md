@@ -36,7 +36,7 @@ on:
 
 ![Preparing the release from the GitHub app](assets/react-native-deployment-workflow/prepare-release-github-mobile.jpeg)
 
-*The preparation workflow runs directly from the GitHub app.*
+_The preparation workflow runs directly from the GitHub app._
 
 Before touching any files, the workflow checks that the release starts from `main`, that the version is valid, and that the “What’s New” field is not empty. It then aligns the app version, package version, and Apple metadata.
 
@@ -72,7 +72,7 @@ From my phone, I can read the changelog and check the changes one last time befo
 
 ![A release pull request with its branch and release notes in the GitHub app](assets/react-native-deployment-workflow/release-pull-request-github-mobile.jpeg)
 
-*The release PR brings the version, branch, and notes together for one last review before merging.*
+_The release PR brings the version, branch, and notes together for one last review before merging._
 
 ## The tag comes after review, not before
 
@@ -131,7 +131,7 @@ Once the binary reaches TestFlight, the release is prepared. I can install it on
 
 ![The iOS build available to install and test in TestFlight](assets/react-native-deployment-workflow/testflight-build-ios-redacted.png)
 
-*The same build is available in TestFlight for a final check on a real device.*
+_The same build is available in TestFlight for a final check on a real device._
 
 That covers what automated tests cannot really measure: the app’s feel, its transitions, and its behaviour on an actual device.
 
@@ -141,7 +141,7 @@ When I am happy with the build, I open a second workflow in GitHub. I enter the 
 
 ![The Submit App Review workflow form in the GitHub app on iPhone](assets/react-native-deployment-workflow/submit-app-review-github-mobile.jpeg)
 
-*After testing, submission to App Review requires explicit confirmation.*
+_After testing, submission to App Review requires explicit confirmation._
 
 ```yaml
 - name: Resolve latest valid build

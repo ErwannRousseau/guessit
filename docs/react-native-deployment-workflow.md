@@ -36,7 +36,7 @@ on:
 
 ![Le formulaire du workflow Prepare release dans l’application GitHub sur iPhone](assets/react-native-deployment-workflow/prepare-release-github-mobile.jpeg)
 
-*Le workflow de préparation se lance directement depuis l’appli GitHub.*
+_Le workflow de préparation se lance directement depuis l’appli GitHub._
 
 Avant de toucher aux fichiers, le workflow vérifie que la release part de `main`, que la version est valide et que le champ « What’s New » n’est pas vide. Il aligne ensuite la version de l’application, du package et des métadonnées Apple.
 
@@ -72,7 +72,7 @@ Depuis mon téléphone, je peux relire le changelog et vérifier une dernière f
 
 ![Une pull request de release avec sa branche et ses release notes dans l’application GitHub](assets/react-native-deployment-workflow/release-pull-request-github-mobile.jpeg)
 
-*La release PR regroupe la version, la branche et les notes à review avant de merge.*
+_La release PR regroupe la version, la branche et les notes à review avant de merge._
 
 ## Le tag vient après la review, pas avant
 
@@ -133,7 +133,7 @@ Une fois le binaire dans TestFlight, la release est préparée. Je peux l’inst
 
 ![Le build iOS disponible pour installation et test dans TestFlight](assets/react-native-deployment-workflow/testflight-build-ios-redacted.png)
 
-*Le même build est disponible dans TestFlight pour la vérification sur un vrai appareil.*
+_Le même build est disponible dans TestFlight pour la vérification sur un vrai appareil._
 
 Ça permet de vérifier ce qu’aucun test automatisé ne mesure vraiment : le feeling de l’application, ses transitions et son comportement sur un vrai appareil.
 
@@ -162,7 +162,7 @@ Le booléen n’est pas là pour décorer le formulaire. Sans confirmation, le j
 
 ![Le formulaire du workflow Submit App Review dans l’application GitHub sur iPhone](assets/react-native-deployment-workflow/submit-app-review-github-mobile.jpeg)
 
-*Après les tests, la soumission à App Review demande une confirmation explicite.*
+_Après les tests, la soumission à App Review demande une confirmation explicite._
 
 ```yaml
 - name: Resolve latest valid build
